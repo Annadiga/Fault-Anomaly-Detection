@@ -8,12 +8,12 @@ clc;
 
 
 
-%%------------------------------------------------------
+%% ------------------------------------------------------
 
 mkdir topics;
 
 
-%%------------------------------------------------------
+%% ------------------------------------------------------
 % Specify the directory path
 path_input = 'processed_MAT_Files';
 
@@ -29,6 +29,15 @@ for i = 1:numel(files)
         slash = "/";
         % file_to_get = [path_input slash file_name];
         file_to_get = strcat(path_input, slash, file_name);
+
+        % make filename without "carbon_Z"
+
+        file_name = string(file_name);
+
+        file_name = replace(file_name, 'carbonZ', 'cZ');
+        
+        % file_name = char(file_name);
+        % file_name_ = substring(file_name, 8+1:end);
 
 
         % Generate a dynamic variable name based on the file name
