@@ -21,6 +21,8 @@ topics = fieldnames(Sequence.Topics);
 % Get the start time to normalize times to start from zero
 start_time = Sequence.GetStartTime();
 
+fault_label = 0; %if 0 NO FAULT
+
 for i = 1:numel(topics)
     % Get the topic name
     topic_name = topics(i);
@@ -36,7 +38,15 @@ for i = 1:numel(topics)
 
     % Add column "times" with normalized time
     data.times = times;
-    if i == 2
+
+    if isequal(topic_name{1}, 'failure_status_engines')
+        %disp(topic_name)
+        fault_label = 1; 
+    end
+
+
+
+    if i == 1
         break
     end
 end
