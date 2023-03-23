@@ -5,7 +5,14 @@ clc;
 
 %% CREAZIONE TABELLA FINALE CON ATTRIBUTI DI INTERESSE
 % var1 | var2 | var 3 | ... | fault_label
-dataTable = table('Size',[1 1], 'VariableTypes', {'int8'}, 'VariableNames',{'FaultLabel'});
+%dataTable = table('Size',[1 1], 'VariableTypes', {'int8'}, 'VariableNames',{'FaultLabel'});
+dataTable = table('Size',[1 4], 'VariableTypes', {'timetable','timetable','timetable','int8'}, 'VariableNames',{'s_errVel_xTT', 's_errVel_yTT', 's_errVel_zTT' ,'FaultLabel'});
+%dataTable = table('Size',[1 3], 'VariableTypes', {'timetable','timetable','timetable'}, 'VariableNames',{'s_errVel_xTT', 's_errVel_yTT', 's_errVel_zTT'});
+
+
+
+freq_sampling = 25;
+formatIn = 'ss.SSSSSSSSSSSSSSS'; % define the input format for seconds with fractional values
 
 %% 
 % METTEREMO CICLO ESTERNO
@@ -41,6 +48,10 @@ for i = 1:numel(topics)
     % Get the topic name
     topic_name = topics(i);
 
+    if isequal(topic_name{1}, 'mavros_imu_data_raw') || isequal(topic_name{1}, 'mavros_imu_mag')
+        continue
+    end
+
     % Assign data to variable topic 
     topic = Sequence.GetTopicByName(topic_name{1});
 
@@ -68,13 +79,46 @@ for i = 1:numel(topics)
     % fault label = 0
     % GESTIRE CASO IN CUI DUE LABEL PERCHE' RIGHT A E LEFT AILERON, E ANCHE
     % RUDDER E AILERON
-
     
 
+    if isequal(topic_name{1}, 'mavros_nav_info_velocity')
+        data.errVel_x = data.des_x - data.meas_x;
+        data.errVel_y = data.des_y - data.meas_y;
+        data.errVel_z = data.des_z - data.meas_z;
+        % data = removevars(data, {'coordinate_frame','des_x','des_y','des_z','header','meas_x','meas_y','meas_z','time_recv'});
+        
+        %timestamps = datetime(data.times, 'ConvertFrom', 'posixtime', 'Format', formatIn);
+        timestamps = seconds(data.times);
+        % Create timetables
+        errVel_xTT = timetable(timestamps, data.errVel_x);
+        errVel_yTT = timetable(timestamps, data.errVel_y);
+        errVel_zTT = timetable(timestamps, data.errVel_z);
 
-    if i == 1
+        % Sampling timestamps in the topic for 25 Hz
+        s_errVel_xTT = resample(errVel_xTT, freq_sampling);
+        s_errVel_yTT = resample(errVel_yTT, freq_sampling);
+        s_errVel_zTT = resample(errVel_zTT, freq_sampling);
+
+        subplot(2,1,1)
+        plot(errVel_xTT.timestamps,errVel_xTT.Var1,'-o')
+        subplot(2,1,2)
+        plot(s_errVel_xTT.Time, s_errVel_xTT.Var1,'-o')
+
+
+        dataTable.s_errVel_xTT(j) = s_errVel_xTT;
+        dataTable.s_errVel_yTT(j) = s_errVel_yTT;
+        dataTable.s_errVel_zTT(j) = s_errVel_zTT;
+
+
+    end
+
+
+    if i == 4
         break
     end
 end
 
+
+%% TEST 
+%dataTable = cell2table(cell(1,1), 'VariableNames',{'s_errVel_xTT'});
 
