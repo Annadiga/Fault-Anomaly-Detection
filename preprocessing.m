@@ -48,7 +48,7 @@ for i = 1:numel(topics)
     % Get the topic name
     topic_name = topics(i);
 
-    if isequal(topic_name{1}, 'mavros_imu_data_raw') || isequal(topic_name{1}, 'mavros_imu_mag') || isequal(topic_name{1}, 'mavros_imu_atm_pressure') || isequal(topic_name{1}, 'mavros_global_position_compass_hdg') || isequal(topic_name{1}, 'mavctrl_rpy') || isequal(topic_name{1}, 'mavlink_from') ||  isequal(topic_name{1}, 'mavros_local_position_pose') || isequal(topic_name{1}, 'mavros_imu_data') || isequal(topic_name{1}, 'mavros_wind_estimation') || isequal(topic_name{1}, 'mavros_setpoint_raw_target_global') || isequal(topic_name{1}, 'mavros_imu_temperature') 
+    if isequal(topic_name{1}, 'mavros_imu_data_raw') || isequal(topic_name{1}, 'mavros_imu_mag') || isequal(topic_name{1}, 'mavros_imu_atm_pressure') || isequal(topic_name{1}, 'mavros_global_position_compass_hdg') || isequal(topic_name{1}, 'mavctrl_rpy') || isequal(topic_name{1}, 'mavlink_from') ||  isequal(topic_name{1}, 'mavros_local_position_pose') || isequal(topic_name{1}, 'mavros_imu_data') || isequal(topic_name{1}, 'mavros_wind_estimation') || isequal(topic_name{1}, 'mavros_setpoint_raw_target_global') || isequal(topic_name{1}, 'mavros_imu_temperature') || isequal(topic_name{1}, 'diagnostics') || isequal(topic_name{1}, 'mavros_global_position_raw_fix') 
         continue
     end
 
@@ -127,6 +127,8 @@ for i = 1:numel(topics)
         latitudeTT = timetable(timestamps, data.latitude);
         longitudeTT = timetable(timestamps, data.longitude);
         
+        
+
 
         % Sampling timestamps in the topic for 25 Hz
         s_altitudeTT = resample(altitudeTT, freq_sampling);
@@ -155,7 +157,11 @@ for i = 1:numel(topics)
 
     end
 
-    if i == 14
+    if isequal(topic_name{1}, 'mavros_nav_info_roll')
+        
+    end
+
+    if i == 17
         break
     end
 end
