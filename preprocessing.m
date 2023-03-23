@@ -11,7 +11,7 @@ clc;
 dataTable = table();
 
 
-freq_sampling = 25;
+freq_sampling = 5;
 %formatIn = 'ss.SSSSSSSSSSSSSSS'; % define the input format for seconds with fractional values
 
 %% 
@@ -22,6 +22,7 @@ freq_sampling = 25;
 % test
 
 j = 1; % lo leveremo con ciclo esterno perché faremo j = 1:numel(nomi dei file (test))
+% mettere if ground truth continue
 
 
 %% Input .mat file
@@ -52,6 +53,19 @@ for i = 1:numel(topics)
         continue
     end
 
+    if isequal(topic_name{1}, 'failure_status_engines')
+        fault_label = 1;
+        dataTable.FaultLabel(j) = fault_label;
+        continue
+    end
+    % else controllo tabella altri tipi di failure
+    % else controllo tabella altri tipi di failure
+    % else controllo tabella altri tipi di failure
+    % ELSE ricadiamo qui solo se il test non presenta un guasto -> quindi
+    % fault label = 0
+    % GESTIRE CASO IN CUI DUE LABEL PERCHE' RIGHT A E LEFT AILERON, E ANCHE
+    % RUDDER E AILERON
+
     % Assign data to variable topic 
     topic = Sequence.GetTopicByName(topic_name{1});
 
@@ -68,17 +82,7 @@ for i = 1:numel(topics)
 
     % code to check label
     
-    if isequal(topic_name{1}, 'failure_status_engines')
-        fault_label = 1;
-        dataTable.FaultLabel(j) = fault_label;
-    end
-    % else controllo tabella altri tipi di failure
-    % else controllo tabella altri tipi di failure
-    % else controllo tabella altri tipi di failure
-    % ELSE ricadiamo qui solo se il test non presenta un guasto -> quindi
-    % fault label = 0
-    % GESTIRE CASO IN CUI DUE LABEL PERCHE' RIGHT A E LEFT AILERON, E ANCHE
-    % RUDDER E AILERON
+    
     
 
     if isequal(topic_name{1}, 'mavros_nav_info_velocity')
@@ -104,19 +108,23 @@ for i = 1:numel(topics)
         s_errVel_zTT = resample(errVel_zTT, freq_sampling);
         s_errVel_zTT = renamevars(s_errVel_zTT, 'Var1', 's_errVel_z');
 
+          
+        f1=figure('Name', 'errVel_x before and after sampling','position',[150,0,1000,650]);
+        f11=subplot(2,1,1,'Parent',f1);
+        plot(errVel_xTT.timestamps,errVel_xTT.Var1,'-o');
+        f12=subplot(2,1,2,'Parent',f1);
+        plot(s_errVel_xTT.Time, s_errVel_xTT.s_errVel_x,'-o');
 
-        subplot(2,1,1)
-        plot(errVel_xTT.timestamps,errVel_xTT.Var1,'-o')
-        subplot(2,1,2)
-        plot(s_errVel_xTT.Time, s_errVel_xTT.s_errVel_x,'-o')
 
+        % subplot(2,1,1)
+        % plot(errVel_xTT.timestamps,errVel_xTT.Var1,'-o')
+        % subplot(2,1,2)
+        % plot(s_errVel_xTT.Time, s_errVel_xTT.s_errVel_x,'-o')
 
 
         dataTable.s_errVel_xTT(j) = {s_errVel_xTT};
         dataTable.s_errVel_yTT(j) = {s_errVel_yTT};
         dataTable.s_errVel_zTT(j) = {s_errVel_zTT};
-
-
     end
 
 
@@ -127,26 +135,33 @@ for i = 1:numel(topics)
         latitudeTT = timetable(timestamps, data.latitude);
         longitudeTT = timetable(timestamps, data.longitude);
         
-        
 
-
-        % Sampling timestamps in the topic for 25 Hz
+        % Sampling timestamps in the topic for 5 Hz
         s_altitudeTT = resample(altitudeTT, freq_sampling);
         s_altitudeTT = renamevars(s_altitudeTT, 'Var1', 's_altitute');
 
         s_latitudeTT = resample(latitudeTT, freq_sampling);
         s_latitudeTT = renamevars(s_latitudeTT, 'Var1', 's_latitude');
 
-        s_longitudeTT = resample(errVel_zTT, freq_sampling);
+        s_longitudeTT = resample(longitudeTT, freq_sampling);
         s_longitudeTT = renamevars(s_longitudeTT, 'Var1', 's_longitude');
-
-
-        subplot(2,1,1)
+        
+        f2=figure('Name', 'altitude before and after sampling','position',[150,0,1000,650]);
+        f21=subplot(2,1,1,'Parent',f2);
         plot(altitudeTT.timestamps,altitudeTT.Var1,'-o')
-        subplot(2,1,2)
+        f22=subplot(2,1,2,'Parent',f2);
         plot(s_altitudeTT.Time, s_altitudeTT.s_altitute,'-o')
 
+        f3=figure('Name', 'longitude before and after sampling','position',[150,0,1000,650]);
+        f31=subplot(2,1,1,'Parent',f3);
+        plot(longitudeTT.timestamps,longitudeTT.Var1,'-o')
+        f32=subplot(2,1,2,'Parent',f3);
+        plot(s_longitudeTT.Time, s_longitudeTT.s_longitude,'-o')
 
+        % subplot(2,1,1)
+        % plot(altitudeTT.timestamps,altitudeTT.Var1,'-o')
+        % subplot(2,1,2)
+        % plot(s_altitudeTT.Time, s_altitudeTT.s_altitute,'-o')
 
         dataTable.s_altitudeTT(j) = {s_altitudeTT};
         dataTable.s_latitudeTT(j) = {s_latitudeTT};
@@ -160,7 +175,8 @@ for i = 1:numel(topics)
     if isequal(topic_name{1}, 'mavros_nav_info_roll')
         
     end
-
+    
+    %if i == 2
     if i == 17
         break
     end
