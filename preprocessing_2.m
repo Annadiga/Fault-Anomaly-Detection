@@ -44,7 +44,7 @@ for i = 1:numel(topics)
     % Get the topic name
     topic_name = topics(i);
 
-    if  isequal(topic_name{1}, 'mavros_imu_data_raw') || isequal(topic_name{1}, 'mavros_imu_atm_pressure') || isequal(topic_name{1}, 'mavros_global_position_compass_hdg') || isequal(topic_name{1}, 'mavctrl_rpy') || isequal(topic_name{1}, 'mavlink_from') ||  isequal(topic_name{1}, 'mavros_local_position_pose') || isequal(topic_name{1}, 'mavros_wind_estimation') || isequal(topic_name{1}, 'mavros_setpoint_raw_target_global') || isequal(topic_name{1}, 'mavros_imu_temperature') || isequal(topic_name{1}, 'diagnostics') || isequal(topic_name{1}, 'mavros_global_position_raw_fix') || isequal(topic_name{1}, 'mavros_state') || isequal(topic_name{1}, 'mavros_rc_in') || isequal(topic_name{1}, 'mavros_setpoint_raw_local') || isequal(topic_name{1}, 'mavros_battery') || isequal(topic_name{1}, 'mavros_nav_info_airspeed') || isequal(topic_name{1}, 'mavros_global_position_local') || isequal(topic_name{1}, 'mavros_vfr_hud') || isequal(topic_name{1}, 'mavros_global_position_rel_alt') || isequal(topic_name{1}, 'mavros_nav_info_errors') || isequal(topic_name{1}, 'mavros_local_position_odom') 
+    if  isequal(topic_name{1}, 'mavros_imu_data_raw') || isequal(topic_name{1}, 'mavros_imu_atm_pressure') || isequal(topic_name{1}, 'mavros_global_position_compass_hdg') || isequal(topic_name{1}, 'mavctrl_rpy') || isequal(topic_name{1}, 'mavlink_from') ||  isequal(topic_name{1}, 'mavros_local_position_pose') || isequal(topic_name{1}, 'mavros_wind_estimation') || isequal(topic_name{1}, 'mavros_setpoint_raw_target_global') || isequal(topic_name{1}, 'mavros_imu_temperature') || isequal(topic_name{1}, 'diagnostics') || isequal(topic_name{1}, 'mavros_global_position_raw_fix') || isequal(topic_name{1}, 'mavros_state') || isequal(topic_name{1}, 'mavros_rc_in') || isequal(topic_name{1}, 'mavros_setpoint_raw_local') || isequal(topic_name{1}, 'mavros_battery') || isequal(topic_name{1}, 'mavros_global_position_local') || isequal(topic_name{1}, 'mavros_vfr_hud') || isequal(topic_name{1}, 'mavros_global_position_rel_alt') || isequal(topic_name{1}, 'mavros_local_position_odom') 
         continue
         
     end
@@ -190,6 +190,26 @@ for i = 1:numel(topics)
         topic_err_roll_TT = renamevars(topic_err_roll_TT, 'Var1', 'err_roll');    
     end
 
+
+
+    if isequal(topic_name{1}, 'mavros_nav_info_airspeed')
+
+        data.err_airspeed = abs(data.measured - data.commanded);
+        
+        % Create timetable 
+        topic_err_airspeed_TT = timetable(timestamps, data.err_airspeed);
+        topic_err_airspeed_TT = renamevars(topic_err_airspeed_TT, 'Var1', 'err_airspeed');    
+
+    end
+
+    if isequal(topic_name{1}, 'mavros_nav_info_errors')   
+        topic_info_errors_TT = timetable(timestamps, data.aspd_error, data.alt_error);
+        topic_info_errors_TT = renamevars(topic_info_errors_TT, 'Var1', 'aspd_error');
+        topic_info_errors_TT = renamevars(topic_info_errors_TT, 'Var2', 'alt_error');
+
+    end
+
+
     if isequal(topic_name{1}, 'mavros_nav_info_yaw')
         data.err_yaw = abs(data.measured - data.commanded);
 
@@ -212,7 +232,7 @@ for i = 1:numel(topics)
     if i == 29 %pitch
 
         % test_TT = synchronize(topic_velocity_TT,topic_global_position_TT, topic_imu_data_row_TT, 'union', 'linear');
-        test_TT = synchronize(topic_imu_mag_TT, topic_velocity_TT,topic_global_position_TT, topic_imu_data_TT, topic_err_roll_TT, topic_err_yaw_TT, topic_err_pitch_TT, 'regular', 'linear', 'SampleRate', fs_new);
+        test_TT = synchronize(topic_imu_mag_TT, topic_velocity_TT,topic_global_position_TT, topic_imu_data_TT, topic_err_roll_TT, topic_err_airspeed_TT, topic_info_errors_TT, topic_err_yaw_TT, topic_err_pitch_TT, 'regular', 'linear', 'SampleRate', fs_new);
 
         %{
         f1=figure('Name', 'errVel_x before and after sampling','position',[150,0,1000,650]);
@@ -300,6 +320,11 @@ for i = 1:numel(topics)
 
         err_roll_TT = timetable(test_TT.timestamps, test_TT.err_roll);
 
+        err_airspeed_TT = timetable(test_TT.timestamps, test_TT.err_airspeed);
+
+        aspd_error_TT = timetable(test_TT.timestamps, test_TT.aspd_error);
+        alt_error_TT = timetable(test_TT.timestamps, test_TT.alt_error);
+
         err_yaw_TT = timetable(test_TT.timestamps, test_TT.err_yaw);
 
         err_pitch_TT = timetable(test_TT.timestamps, test_TT.err_pitch);
@@ -331,6 +356,13 @@ for i = 1:numel(topics)
 
         % topic mavros info roll
         dataTable.err_roll_TT(j) = {err_roll_TT};
+
+        % topic mavros info airspeed
+        dataTable.err_airspeed_TT(j) = {err_airspeed_TT};
+
+        %topic mavros nav info errors
+        dataTable.aspd_error_TT(j) = {aspd_error_TT};
+        dataTable.alt_error_TT(j) = {alt_error_TT};
 
         % topic mavros info yaw
         dataTable.err_yaw_TT(j) = {err_yaw_TT};
