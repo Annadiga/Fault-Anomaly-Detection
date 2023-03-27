@@ -187,8 +187,7 @@ for i = 1:numel(topics)
         
         % Create timetable 
         topic_err_roll_TT = timetable(timestamps, data.err_roll);
-        topic_err_roll_TT = renamevars(topic_err_roll_TT, 'Var1', 'err_roll');
-        
+        topic_err_roll_TT = renamevars(topic_err_roll_TT, 'Var1', 'err_roll');    
     end
 
     if isequal(topic_name{1}, 'mavros_nav_info_yaw')
@@ -197,9 +196,7 @@ for i = 1:numel(topics)
         % Create timetable 
         topic_err_yaw_TT = timetable(timestamps, data.err_yaw);
         topic_err_yaw_TT = renamevars(topic_err_yaw_TT, 'Var1', 'err_yaw');
-
     end
-
 
     if isequal(topic_name{1}, 'mavros_nav_info_pitch')
         data.err_pitch = abs(data.measured - data.commanded);
@@ -207,8 +204,6 @@ for i = 1:numel(topics)
         % Create timetable 
         topic_err_pitch_TT = timetable(timestamps, data.err_pitch);
         topic_err_pitch_TT = renamevars(topic_err_pitch_TT, 'Var1', 'err_pitch');
-
-
     end
     
     % if i == 2 % velocity
@@ -244,8 +239,6 @@ for i = 1:numel(topics)
         f22=subplot(2,1,2,'Parent',f2);
         plot(test_TT.timestamps, test_TT.altitude,'-o');
         
-        
-
         f5=figure('Name', 'linAcc_x before and after sampling','position',[150,0,1000,650]);
         f51=subplot(2,1,1,'Parent',f5);
         plot(topic_imu_data_TT.timestamps, topic_imu_data_TT.linAcc_x,'-o');
@@ -257,13 +250,33 @@ for i = 1:numel(topics)
         plot(topic_imu_data_TT.timestamps, topic_imu_data_TT.angVel_x,'-o');
         f62=subplot(2,1,2,'Parent',f6);
         plot(test_TT.timestamps, test_TT.angVel_x,'-o');
-        %}
-
+       
         f7=figure('Name', 'mag_x before and after sampling','position',[150,0,1000,650]);
         f71=subplot(2,1,1,'Parent',f7);
         plot(topic_imu_mag_TT.timestamps, topic_imu_mag_TT.mag_x,'-o');
         f72=subplot(2,1,2,'Parent',f7);
         plot(test_TT.timestamps, test_TT.mag_x,'-o');
+        %}
+
+        f8=figure('Name', 'err_roll before and after sampling','position',[150,0,1000,650]);
+        f81=subplot(2,1,1,'Parent',f8);
+        plot(topic_err_roll_TT.timestamps, topic_err_roll_TT.err_roll,'-o');
+        f82=subplot(2,1,2,'Parent',f8);
+        plot(test_TT.timestamps, test_TT.err_roll,'-o');
+
+        f9=figure('Name', 'err_yaw before and after sampling','position',[150,0,1000,650]);
+        f91=subplot(2,1,1,'Parent',f9);
+        plot(topic_err_yaw_TT.timestamps, topic_err_yaw_TT.err_yaw,'-o');
+        f92=subplot(2,1,2,'Parent',f9);
+        plot(test_TT.timestamps, test_TT.err_yaw,'-o');
+
+        f10=figure('Name', 'err_pitch before and after sampling','position',[150,0,1000,650]);
+        f101=subplot(2,1,1,'Parent',f10);
+        plot(topic_err_pitch_TT.timestamps, topic_err_pitch_TT.err_pitch,'-o');
+        f102=subplot(2,1,2,'Parent',f10);
+        plot(test_TT.timestamps, test_TT.err_pitch,'-o');
+
+
             
         % create timetables to put in the final table
         mag_xTT = timetable(test_TT.timestamps, test_TT.mag_x);
