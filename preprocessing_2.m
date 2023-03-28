@@ -43,17 +43,20 @@ fault_label = int8(0); % if 0 NO FAULT
 for i = 1:numel(topics)
     % Get the topic name
     topic_name = topics(i);
+    disp(topic_name)
 
-    if  isequal(topic_name{1}, 'mavros_imu_data_raw') || isequal(topic_name{1}, 'mavros_imu_atm_pressure') || isequal(topic_name{1}, 'mavros_global_position_compass_hdg') || isequal(topic_name{1}, 'mavctrl_rpy') || isequal(topic_name{1}, 'mavlink_from') ||  isequal(topic_name{1}, 'mavros_local_position_pose') || isequal(topic_name{1}, 'mavros_wind_estimation') || isequal(topic_name{1}, 'mavros_setpoint_raw_target_global') || isequal(topic_name{1}, 'mavros_imu_temperature') || isequal(topic_name{1}, 'diagnostics') || isequal(topic_name{1}, 'mavros_global_position_raw_fix') || isequal(topic_name{1}, 'mavros_state') || isequal(topic_name{1}, 'mavros_rc_in') || isequal(topic_name{1}, 'mavros_setpoint_raw_local') || isequal(topic_name{1}, 'mavros_battery') || isequal(topic_name{1}, 'mavros_global_position_local') || isequal(topic_name{1}, 'mavros_vfr_hud') || isequal(topic_name{1}, 'mavros_global_position_rel_alt') || isequal(topic_name{1}, 'mavros_local_position_odom') 
+    if  isequal(topic_name{1}, 'mavros_imu_data_raw') || isequal(topic_name{1}, 'mavros_imu_atm_pressure') || isequal(topic_name{1}, 'mavros_global_position_compass_hdg') || isequal(topic_name{1}, 'mavctrl_rpy') || isequal(topic_name{1}, 'mavlink_from') ||  isequal(topic_name{1}, 'mavros_local_position_pose') || isequal(topic_name{1}, 'mavros_wind_estimation') || isequal(topic_name{1}, 'mavros_setpoint_raw_target_global') || isequal(topic_name{1}, 'mavros_imu_temperature') || isequal(topic_name{1}, 'diagnostics') || isequal(topic_name{1}, 'mavros_global_position_raw_fix') || isequal(topic_name{1}, 'mavros_state') || isequal(topic_name{1}, 'mavros_rc_in') || isequal(topic_name{1}, 'mavros_setpoint_raw_local') || isequal(topic_name{1}, 'mavros_battery') || isequal(topic_name{1}, 'mavros_global_position_rel_alt') || isequal(topic_name{1}, 'mavros_local_position_odom') || isequal(topic_name{1}, 'mavros_local_position_velocity') || isequal(topic_name{1}, 'mavros_global_position_raw_gps_vel') || isequal(topic_name{1}, 'mavros_rc_out') || isequal(topic_name{1}, 'mavros_time_reference')    
         continue
         
     end
+
 
     if isequal(topic_name{1}, 'failure_status_engines')
         fault_label = 1;
         dataTable.FaultLabel(j) = fault_label;
         continue
     end
+
     % else controllo tabella altri tipi di failure
     % else controllo tabella altri tipi di failure
     % else controllo tabella altri tipi di failure
@@ -86,8 +89,7 @@ for i = 1:numel(topics)
         
         % Loop over rows of the table
         for k = 1:size(data, 1)
-            
-            % Extract structure from table
+           
             myStruct = data.linear_acceleration(k);
             
             % Extract values from fields of structure
@@ -103,6 +105,7 @@ for i = 1:numel(topics)
 
          % ------------ANGULAR VELOCITY---------------
 
+        % Extract structure from table
         angVel_x = [];
         angVel_y = [];
         angVel_z = [];
@@ -180,7 +183,6 @@ for i = 1:numel(topics)
     end
 
 
-
     if isequal(topic_name{1}, 'mavros_nav_info_roll')
 
         data.err_roll = abs(data.measured - data.commanded);
@@ -219,20 +221,71 @@ for i = 1:numel(topics)
     end
 
     if isequal(topic_name{1}, 'mavros_nav_info_pitch')
+   
         data.err_pitch = abs(data.measured - data.commanded);
 
         % Create timetable 
         topic_err_pitch_TT = timetable(timestamps, data.err_pitch);
         topic_err_pitch_TT = renamevars(topic_err_pitch_TT, 'Var1', 'err_pitch');
     end
+
+    if isequal(topic_name{1}, 'mavros_global_position_local')
+
+        position_x = [];
+        position_y = [];
+        position_z = [];
+
+        % Loop over rows of the table
+        for k = 1:size(data, 1)
+            
+            % Extract structure from table
+            myStruct = data.pose(k);
+            
+            % Extract values from fields of structure
+            position_x_value = myStruct.pose.position.x;
+            position_y_value = myStruct.pose.position.y;
+            position_z_value = myStruct.pose.position.z;
+            
+            % Append extracted values to arrays
+            position_x = [position_x; position_x_value];
+            position_y = [position_y; position_y_value];
+            position_z = [position_z; position_z_value];
+      
+        end
+
+        orientation_x = [];
+        orientation_y = [];
+        orientation_z = [];
+
+        % Loop over rows of the table
+        for k = 1:size(data, 1)
+            
+            % Extract structure from table
+            myStruct = data.pose(k);
+            
+            % Extract values from fields of structure
+            orientation_x_value = myStruct.pose.orientation.x;
+            orientation_y_value = myStruct.pose.orientation.y;
+            orientation_z_value = myStruct.pose.orientation.z;
+            
+            % Append extracted values to arrays
+            orientation_x = [orientation_x; orientation_x_value];
+            orientation_y = [orientation_y; orientation_y_value];
+            orientation_z = [orientation_z; orientation_z_value];
+      
+        end
+      
+        topic_global_position_local_TT = timetable(timestamps, position_x, position_y, position_z, orientation_x, orientation_y, orientation_z);
+    end
     
     % if i == 2 % velocity
     % if i == 17 % altitude
-    %if i == 17 %roll
-    if i == 29 %pitch
+    % if i == 17 %roll
+    if i == 29 % pitch
+    %if i == 33 % mav_ctrl_path_dev
 
         % test_TT = synchronize(topic_velocity_TT,topic_global_position_TT, topic_imu_data_row_TT, 'union', 'linear');
-        test_TT = synchronize(topic_imu_mag_TT, topic_velocity_TT,topic_global_position_TT, topic_imu_data_TT, topic_err_roll_TT, topic_err_airspeed_TT, topic_info_errors_TT, topic_err_yaw_TT, topic_err_pitch_TT, 'regular', 'linear', 'SampleRate', fs_new);
+        test_TT = synchronize(topic_imu_mag_TT, topic_velocity_TT,topic_global_position_TT, topic_imu_data_TT, topic_err_roll_TT, topic_err_airspeed_TT, topic_info_errors_TT, topic_err_yaw_TT, topic_err_pitch_TT, topic_global_position_local_TT, 'regular', 'linear', 'SampleRate', fs_new);
 
         %{
         f1=figure('Name', 'errVel_x before and after sampling','position',[150,0,1000,650]);
@@ -276,7 +329,7 @@ for i = 1:numel(topics)
         plot(topic_imu_mag_TT.timestamps, topic_imu_mag_TT.mag_x,'-o');
         f72=subplot(2,1,2,'Parent',f7);
         plot(test_TT.timestamps, test_TT.mag_x,'-o');
-        %}
+        
 
         f8=figure('Name', 'err_roll before and after sampling','position',[150,0,1000,650]);
         f81=subplot(2,1,1,'Parent',f8);
@@ -295,6 +348,13 @@ for i = 1:numel(topics)
         plot(topic_err_pitch_TT.timestamps, topic_err_pitch_TT.err_pitch,'-o');
         f102=subplot(2,1,2,'Parent',f10);
         plot(test_TT.timestamps, test_TT.err_pitch,'-o');
+        %}
+
+        f11=figure('Name', 'orientation_x before and after sampling','position',[150,0,1000,650]);
+        f111=subplot(2,1,1,'Parent',f11);
+        plot(topic_global_position_local_TT.timestamps, topic_global_position_local_TT.orientation_x,'-o');
+        f112=subplot(2,1,2,'Parent',f11);
+        plot(test_TT.timestamps, test_TT.orientation_x,'-o');
 
 
             
@@ -328,6 +388,14 @@ for i = 1:numel(topics)
         err_yaw_TT = timetable(test_TT.timestamps, test_TT.err_yaw);
 
         err_pitch_TT = timetable(test_TT.timestamps, test_TT.err_pitch);
+
+        position_xTT = timetable(test_TT.timestamps, test_TT.position_x);
+        position_yTT = timetable(test_TT.timestamps, test_TT.position_y);
+        position_zTT = timetable(test_TT.timestamps, test_TT.position_z);
+
+        orientation_xTT = timetable(test_TT.timestamps, test_TT.orientation_x);
+        orientation_yTT = timetable(test_TT.timestamps, test_TT.orientation_y);
+        orientation_zTT = timetable(test_TT.timestamps, test_TT.orientation_z);
 
 
         % put timetables in final table
@@ -369,6 +437,14 @@ for i = 1:numel(topics)
 
         % topic mavros info pitch
         dataTable.err_pitch_TT(j) = {err_pitch_TT};
+
+        % topic mavros global position local
+        dataTable.position_xTT(j) = {position_xTT};
+        dataTable.position_yTT(j) = {position_yTT};
+        dataTable.position_zTT(j) = {position_zTT};
+        dataTable.orientation_xTT(j) = {orientation_xTT};
+        dataTable.orientation_yTT(j) = {orientation_yTT};
+        dataTable.orientation_zTT(j) = {orientation_zTT};
 
         break
     end
