@@ -41,21 +41,74 @@ start_time = Sequence.GetStartTime();
 fault_label = int8(0); % if 0 NO FAULT
 
 for i = 1:numel(topics)
+    % disp(i)
+    % disp(numel(topics))
+
     % Get the topic name
     topic_name = topics(i);
-    disp(topic_name)
-
+    
+    %{
     if  isequal(topic_name{1}, 'mavros_imu_data_raw') || isequal(topic_name{1}, 'mavros_imu_atm_pressure') || isequal(topic_name{1}, 'mavros_global_position_compass_hdg') || isequal(topic_name{1}, 'mavctrl_rpy') || isequal(topic_name{1}, 'mavlink_from') ||  isequal(topic_name{1}, 'mavros_local_position_pose') || isequal(topic_name{1}, 'mavros_wind_estimation') || isequal(topic_name{1}, 'mavros_setpoint_raw_target_global') || isequal(topic_name{1}, 'mavros_imu_temperature') || isequal(topic_name{1}, 'diagnostics') || isequal(topic_name{1}, 'mavros_global_position_raw_fix') || isequal(topic_name{1}, 'mavros_state') || isequal(topic_name{1}, 'mavros_rc_in') || isequal(topic_name{1}, 'mavros_setpoint_raw_local') || isequal(topic_name{1}, 'mavros_battery') || isequal(topic_name{1}, 'mavros_global_position_rel_alt') || isequal(topic_name{1}, 'mavros_local_position_odom') || isequal(topic_name{1}, 'mavros_local_position_velocity') || isequal(topic_name{1}, 'mavros_global_position_raw_gps_vel') || isequal(topic_name{1}, 'mavros_rc_out') || isequal(topic_name{1}, 'mavros_time_reference')    
         continue
         
     end
+    %}
 
-
+    %{
     if isequal(topic_name{1}, 'failure_status_engines')
         fault_label = 1;
         dataTable.FaultLabel(j) = fault_label;
         continue
-    end
+      
+    elseif isequal(topic_name{1}, '')
+        fault_label = 2;
+        dataTable.FaultLabel(j) = fault_label;
+        continue
+
+    elseif isequal(topic_name{1}, '')
+        fault_label = 3;
+        dataTable.FaultLabel(j) = fault_label;
+        continue
+
+    elseif isequal(topic_name{1}, '')
+        fault_label = 4;
+        dataTable.FaultLabel(j) = fault_label;
+        continue        
+  
+    elseif isequal(topic_name{1}, '')
+        fault_label = 5;
+        dataTable.FaultLabel(j) = fault_label;
+        continue
+
+    elseif isequal(topic_name{1}, '')
+        fault_label = 6;
+        dataTable.FaultLabel(j) = fault_label;
+        continue  
+    
+    elseif isequal(topic_name{1}, '')
+        fault_label = 7;
+        dataTable.FaultLabel(j) = fault_label;
+        continue  
+
+    elseif isequal(topic_name{1}, '')
+        fault_label = 8;
+        dataTable.FaultLabel(j) = fault_label;
+        continue  
+    end   
+
+    
+        0 NO GUASTO
+        1 guasto engine
+        2 aileron destra
+        3 aileron sinistra
+        4 aileron entrambi
+        5 rudder & aileron posizione 0
+        6 rudder sinistra
+        7 rudder destra
+        8 elevator posizione 0
+    %}
+
+
 
     % else controllo tabella altri tipi di failure
     % else controllo tabella altri tipi di failure
@@ -277,15 +330,30 @@ for i = 1:numel(topics)
       
         topic_global_position_local_TT = timetable(timestamps, position_x, position_y, position_z, orientation_x, orientation_y, orientation_z);
     end
+
+    if isequal(topic_name{1}, 'mavros_vfr_hud')   
+        topic_vfr_hud_TT = timetable(timestamps, data.throttle);
+        topic_vfr_hud_TT = renamevars(topic_vfr_hud_TT, 'Var1', 'throttle');
+    end
+
+    if isequal(topic_name{1}, 'mavctrl_path_dev')   
+        topic_mavctrl_path_dev_TT = timetable(timestamps, data.x, data.y, data.z);
+        topic_mavctrl_path_dev_TT = renamevars(topic_mavctrl_path_dev_TT, 'Var1', 'path_dev_x');
+        topic_mavctrl_path_dev_TT = renamevars(topic_mavctrl_path_dev_TT, 'Var2', 'path_dev_y');
+        topic_mavctrl_path_dev_TT = renamevars(topic_mavctrl_path_dev_TT, 'Var3', 'path_dev_z');
+    end
     
     % if i == 2 % velocity
     % if i == 17 % altitude
     % if i == 17 %roll
-    if i == 29 % pitch
-    %if i == 33 % mav_ctrl_path_dev
+    % if i == 29 % pitch
+    % if i == 33 % mav_ctrl_path_dev
+    % if i == numel(topics) % mavros_time_reference
+
+    if isequal(i, numel(topics)) 
 
         % test_TT = synchronize(topic_velocity_TT,topic_global_position_TT, topic_imu_data_row_TT, 'union', 'linear');
-        test_TT = synchronize(topic_imu_mag_TT, topic_velocity_TT,topic_global_position_TT, topic_imu_data_TT, topic_err_roll_TT, topic_err_airspeed_TT, topic_info_errors_TT, topic_err_yaw_TT, topic_err_pitch_TT, topic_global_position_local_TT, 'regular', 'linear', 'SampleRate', fs_new);
+        test_TT = synchronize(topic_imu_mag_TT, topic_velocity_TT,topic_global_position_TT, topic_imu_data_TT, topic_err_roll_TT, topic_err_airspeed_TT, topic_info_errors_TT, topic_err_yaw_TT, topic_err_pitch_TT, topic_global_position_local_TT, topic_vfr_hud_TT, topic_mavctrl_path_dev_TT, 'regular', 'linear', 'SampleRate', fs_new);
 
         %{
         f1=figure('Name', 'errVel_x before and after sampling','position',[150,0,1000,650]);
@@ -348,7 +416,7 @@ for i = 1:numel(topics)
         plot(topic_err_pitch_TT.timestamps, topic_err_pitch_TT.err_pitch,'-o');
         f102=subplot(2,1,2,'Parent',f10);
         plot(test_TT.timestamps, test_TT.err_pitch,'-o');
-        %}
+      
 
         f11=figure('Name', 'orientation_x before and after sampling','position',[150,0,1000,650]);
         f111=subplot(2,1,1,'Parent',f11);
@@ -356,8 +424,24 @@ for i = 1:numel(topics)
         f112=subplot(2,1,2,'Parent',f11);
         plot(test_TT.timestamps, test_TT.orientation_x,'-o');
 
+        
 
-            
+        f12=figure('Name', 'throttle before and after sampling','position',[150,0,1000,650]);
+        f121=subplot(2,1,1,'Parent',f12);
+        plot(topic_vfr_hud_TT.timestamps, topic_vfr_hud_TT.throttle,'-o');
+        f122=subplot(2,1,2,'Parent',f12);
+        plot(test_TT.timestamps, test_TT.throttle,'-o');
+        
+       
+
+        f13=figure('Name', 'path_dev_y before and after sampling','position',[150,0,1000,650]);
+        f131=subplot(2,1,1,'Parent',f13);
+        plot(topic_mavctrl_path_dev_TT.timestamps, topic_mavctrl_path_dev_TT.path_dev_y,'-o');
+        f132=subplot(2,1,2,'Parent',f13);
+        plot(test_TT.timestamps, test_TT.path_dev_y,'-o');
+        
+        %}
+ 
         % create timetables to put in the final table
         mag_xTT = timetable(test_TT.timestamps, test_TT.mag_x);
         mag_yTT = timetable(test_TT.timestamps, test_TT.mag_y);
@@ -396,6 +480,12 @@ for i = 1:numel(topics)
         orientation_xTT = timetable(test_TT.timestamps, test_TT.orientation_x);
         orientation_yTT = timetable(test_TT.timestamps, test_TT.orientation_y);
         orientation_zTT = timetable(test_TT.timestamps, test_TT.orientation_z);
+
+        throttleTT = timetable(test_TT.timestamps, test_TT.throttle);
+
+        path_dev_xTT = timetable(test_TT.timestamps, test_TT.path_dev_x);
+        path_dev_yTT = timetable(test_TT.timestamps, test_TT.path_dev_y);
+        path_dev_zTT = timetable(test_TT.timestamps, test_TT.path_dev_z);
 
 
         % put timetables in final table
@@ -446,7 +536,13 @@ for i = 1:numel(topics)
         dataTable.orientation_yTT(j) = {orientation_yTT};
         dataTable.orientation_zTT(j) = {orientation_zTT};
 
-        break
+        % topic mavros vfr hud
+        dataTable.throttle(j) = {throttleTT};
+
+        % topic mvctrl path dev
+        dataTable.path_dev_x(j) = {path_dev_xTT};
+        dataTable.path_dev_y(j) = {path_dev_yTT};
+        dataTable.path_dev_z(j) = {path_dev_zTT};
     end
 end
 
