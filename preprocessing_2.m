@@ -183,31 +183,7 @@ for j = 1:length(fileList)
         end
     
     
-        if isequal(topic_name{1}, 'mavros_imu_mag')
-    
-            mag_x = [];
-            mag_y = [];
-            mag_z = [];
-    
-            % Loop over rows of the table
-            for k = 1:size(data, 1)
-                
-                % Extract structure from table
-                myStruct = data.magnetic_field(k);
-                
-                % Extract values from fields of structure
-                mag_x_value = myStruct.x;
-                mag_y_value = myStruct.y;
-                mag_z_value = myStruct.z;
-                
-                % Append extracted values to arrays
-                mag_x = [mag_x; mag_x_value];
-                mag_y = [mag_y; mag_y_value];
-                mag_z = [mag_z; mag_z_value];
-            end
-    
-            topic_imu_mag_TT = timetable(timestamps, mag_x, mag_y, mag_z);
-        end
+      
       
     
         if isequal(topic_name{1}, 'mavros_nav_info_velocity')
@@ -281,59 +257,6 @@ for j = 1:length(fileList)
             topic_err_pitch_TT = renamevars(topic_err_pitch_TT, 'Var1', 'err_pitch');
         end
     
-        if isequal(topic_name{1}, 'mavros_global_position_local')
-    
-            position_x = [];
-            position_y = [];
-            position_z = [];
-    
-            % Loop over rows of the table
-            for k = 1:size(data, 1)
-                
-                % Extract structure from table
-                myStruct = data.pose(k);
-                
-                % Extract values from fields of structure
-                position_x_value = myStruct.pose.position.x;
-                position_y_value = myStruct.pose.position.y;
-                position_z_value = myStruct.pose.position.z;
-                
-                % Append extracted values to arrays
-                position_x = [position_x; position_x_value];
-                position_y = [position_y; position_y_value];
-                position_z = [position_z; position_z_value];
-          
-            end
-    
-            orientation_x = [];
-            orientation_y = [];
-            orientation_z = [];
-    
-            % Loop over rows of the table
-            for k = 1:size(data, 1)
-                
-                % Extract structure from table
-                myStruct = data.pose(k);
-                
-                % Extract values from fields of structure
-                orientation_x_value = myStruct.pose.orientation.x;
-                orientation_y_value = myStruct.pose.orientation.y;
-                orientation_z_value = myStruct.pose.orientation.z;
-                
-                % Append extracted values to arrays
-                orientation_x = [orientation_x; orientation_x_value];
-                orientation_y = [orientation_y; orientation_y_value];
-                orientation_z = [orientation_z; orientation_z_value];
-          
-            end
-          
-            topic_global_position_local_TT = timetable(timestamps, position_x, position_y, position_z, orientation_x, orientation_y, orientation_z);
-        end
-    
-        if isequal(topic_name{1}, 'mavros_vfr_hud')   
-            topic_vfr_hud_TT = timetable(timestamps, data.throttle);
-            topic_vfr_hud_TT = renamevars(topic_vfr_hud_TT, 'Var1', 'throttle');
-        end
         
         %{
         if isequal(topic_name{1}, 'mavctrl_path_dev')   
@@ -354,7 +277,7 @@ for j = 1:length(fileList)
         if isequal(i, numel(topics)) 
     
             % test_TT = synchronize(topic_velocity_TT,topic_global_position_TT, topic_imu_data_row_TT, 'union', 'linear');
-            test_TT = synchronize(topic_imu_mag_TT, topic_velocity_TT,topic_global_position_TT, topic_imu_data_TT, topic_err_roll_TT, topic_err_airspeed_TT, topic_info_errors_TT, topic_err_yaw_TT, topic_err_pitch_TT, topic_global_position_local_TT, topic_vfr_hud_TT, 'regular', 'linear', 'SampleRate', fs_new);
+            test_TT = synchronize(topic_velocity_TT,topic_global_position_TT, topic_imu_data_TT, topic_err_roll_TT, topic_err_airspeed_TT, topic_info_errors_TT, topic_err_yaw_TT, topic_err_pitch_TT, 'regular', 'linear', 'SampleRate', fs_new);
     
             %{
             f1=figure('Name', 'errVel_x before and after sampling','position',[150,0,1000,650]);
@@ -444,9 +367,6 @@ for j = 1:length(fileList)
             %}
      
             % create timetables to put in the final table
-            mag_xTT = timetable(test_TT.timestamps, test_TT.mag_x);
-            mag_yTT = timetable(test_TT.timestamps, test_TT.mag_y);
-            mag_zTT = timetable(test_TT.timestamps, test_TT.mag_z);
     
             linAcc_xTT = timetable(test_TT.timestamps, test_TT.linAcc_x);
             linAcc_yTT = timetable(test_TT.timestamps, test_TT.linAcc_y);
@@ -474,27 +394,15 @@ for j = 1:length(fileList)
     
             err_pitch_TT = timetable(test_TT.timestamps, test_TT.err_pitch);
     
-            position_xTT = timetable(test_TT.timestamps, test_TT.position_x);
-            position_yTT = timetable(test_TT.timestamps, test_TT.position_y);
-            position_zTT = timetable(test_TT.timestamps, test_TT.position_z);
-    
-            orientation_xTT = timetable(test_TT.timestamps, test_TT.orientation_x);
-            orientation_yTT = timetable(test_TT.timestamps, test_TT.orientation_y);
-            orientation_zTT = timetable(test_TT.timestamps, test_TT.orientation_z);
-    
-            throttleTT = timetable(test_TT.timestamps, test_TT.throttle);
-    
+          
+        
             %path_dev_xTT = timetable(test_TT.timestamps, test_TT.path_dev_x);
             %path_dev_yTT = timetable(test_TT.timestamps, test_TT.path_dev_y);
             %path_dev_zTT = timetable(test_TT.timestamps, test_TT.path_dev_z);
     
     
             % put timetables in final table
-            % topic imu data mag
-            dataTable.mag_xTT(j) = {mag_xTT};
-            dataTable.mag_yTT(j) = {mag_yTT};
-            dataTable.mag_zTT(j) = {mag_zTT};
-    
+            
             % topic imu data raw
             dataTable.linAcc_xTT(j) = {linAcc_xTT};
             dataTable.linAcc_yTT(j) = {linAcc_yTT};
@@ -529,16 +437,8 @@ for j = 1:length(fileList)
             % topic mavros info pitch
             dataTable.err_pitch_TT(j) = {err_pitch_TT};
     
-            % topic mavros global position local
-            dataTable.position_xTT(j) = {position_xTT};
-            dataTable.position_yTT(j) = {position_yTT};
-            dataTable.position_zTT(j) = {position_zTT};
-            dataTable.orientation_xTT(j) = {orientation_xTT};
-            dataTable.orientation_yTT(j) = {orientation_yTT};
-            dataTable.orientation_zTT(j) = {orientation_zTT};
-    
-            % topic mavros vfr hud
-            dataTable.throttle(j) = {throttleTT};
+           
+            
     
             % topic mvctrl path dev
             %{
