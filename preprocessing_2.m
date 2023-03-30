@@ -49,13 +49,15 @@ for j = 1:length(fileList)
     elseif contains(filename, 'both_ailerons')
         fault_label = 4;
         dataTable.FaultLabel(j) = fault_label; 
-
-    elseif contains(filename, 'left_aileron__right_aileron__failure')  % GESTIRE CASO IN CUI DUE LABEL PERCHE' RIGHT A E LEFT AILERON
+    
+    %{
+    elseif contains(filename, 'left_aileron__right_aileron__failure') 
         % fault_label = 100;
         % dataTable.FaultLabel(j) = fault_label; 
         % carbonZ_2018-09-11-14-52-54_left_aileron__right_aileron__failure
         continue % go to the next for loop
 
+    %}
 
     elseif contains(filename, 'left_aileron')
         fault_label = 2;
@@ -76,7 +78,7 @@ for j = 1:length(fileList)
     elseif contains(filename, 'rudder_left')
         fault_label = 6;
         dataTable.FaultLabel(j) = fault_label;
-    end % da levare
+    end 
     
  
     %{
@@ -99,7 +101,7 @@ for j = 1:length(fileList)
     Sequence = sequence(filename);
     
     %% Print brief information about the sequence
-    Sequence.PrintBriefInfo();
+    % Sequence.PrintBriefInfo();
     
     %% For each topic in topics
     topics = fieldnames(Sequence.Topics);
