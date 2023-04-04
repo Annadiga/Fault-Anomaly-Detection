@@ -156,19 +156,21 @@ while hasdata(outputEnsemble)
         % Initialize a table to store results for one frame interval.
         frame = intervals(ct,:);
 
-        %% PowerSpectrum
+
+
+        %% PowerSpectrum - linAcc_x
         try
             % Get units to use in computed spectrum.
             tuReal = "seconds";
             tuTime = tuReal;
 
             % Compute effective sampling rate.
-            tNumeric = time2num(altitudeTT.Time,tuReal);
+            tNumeric = time2num(linAcc_xTT.Time,tuReal);
             [Fs,irregular] = effectivefs(tNumeric);
             Ts = 1/Fs;
 
             % Resample non-uniform signals.
-            x = altitudeTT.Var1;
+            x = linAcc_xTT.Var1;
             if irregular
                 x = resample(x,tNumeric,Fs,'linear');
             end
@@ -199,19 +201,19 @@ while hasdata(outputEnsemble)
             ps.Properties.VariableUnits = ["Hz", ""];
             ps = addprop(ps, {'SampleFrequency'}, {'table'});
             ps.Properties.CustomProperties.SampleFrequency = Fs;
-            altitudeTT_ps = ps;
+            linAcc_xTT_ps = ps;
         catch
-            altitudeTT_ps = table(NaN, NaN, 'VariableNames', ["Frequency", "SpectrumData"]);
+            linAcc_xTT_ps = table(NaN, NaN, 'VariableNames', ["Frequency", "SpectrumData"]);
         end
 
         % Append computed results to the frame table.
         frame = [frame, ...
-            table({altitudeTT_ps},'VariableNames',"altitudeTT_ps")];
+            table({linAcc_xTT_ps},'VariableNames',"linAcc_xTT_ps")];
 
-        %% SignalFeatures
+        %% SignalFeatures - linAcc_x
         try
             % Compute signal features.
-            inputSignal = altitudeTT.Var1;
+            inputSignal = linAcc_xTT.Var1;
             ClearanceFactor = max(abs(inputSignal))/(mean(sqrt(abs(inputSignal)))^2);
             CrestFactor = peak2rms(inputSignal);
             ImpulseFactor = max(abs(inputSignal))/mean(abs(inputSignal));
@@ -228,25 +230,25 @@ while hasdata(outputEnsemble)
 
             % Package computed features into a table.
             featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
-            altitudeTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+            linAcc_xTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
         catch
             % Package computed features into a table.
             featureValues = NaN(1,10);
             featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
-            altitudeTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+            linAcc_xTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
         end
 
         % Append computed results to the frame table.
         frame = [frame, ...
-            table({altitudeTT_sigstats},'VariableNames',"altitudeTT_sigstats")];
+            table({linAcc_xTT_sigstats},'VariableNames',"linAcc_xTT_sigstats")];
 
-        %% SpectrumFeatures
+        %% SpectrumFeatures - linAcc_x
         try
             % Compute spectral features.
             % Get frequency unit conversion factor.
             factor = funitconv('Hz', 'rad/TimeUnit', 'seconds');
-            ps = altitudeTT_ps.SpectrumData;
-            w = altitudeTT_ps.Frequency;
+            ps = linAcc_xTT_ps.SpectrumData;
+            w = linAcc_xTT_ps.Frequency;
             w = factor*w;
             mask_1 = (w>=factor*1) & (w<=factor*10);
             ps = ps(mask_1);
@@ -270,19 +272,22 @@ while hasdata(outputEnsemble)
 
             % Package computed features into a table.
             featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
-            altitudeTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+            linAcc_yTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
         catch
             % Package computed features into a table.
             featureValues = NaN(1,5);
             featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
-            altitudeTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+            linAcc_xTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
         end
 
         % Append computed results to the frame table.
         frame = [frame, ...
-            table({altitudeTT_ps_spec},'VariableNames',"altitudeTT_ps_spec")];
+            table({linAcc_xTT_ps_spec},'VariableNames',"linAcc_xTT_ps_spec")];
 
-        %% PowerSpectrum
+        
+
+%----------------------------------------------------------------------------------------------
+        %% PowerSpectrum - linAcc_y
         try
             % Get units to use in computed spectrum.
             tuReal = "seconds";
@@ -334,7 +339,7 @@ while hasdata(outputEnsemble)
         frame = [frame, ...
             table({linAcc_yTT_ps},'VariableNames',"linAcc_yTT_ps")];
 
-        %% SignalFeatures
+        %% SignalFeatures - linAcc_y
         try
             % Compute signal features.
             inputSignal = linAcc_yTT.Var1;
@@ -366,7 +371,7 @@ while hasdata(outputEnsemble)
         frame = [frame, ...
             table({linAcc_yTT_sigstats},'VariableNames',"linAcc_yTT_sigstats")];
 
-        %% SpectrumFeatures
+        %% SpectrumFeatures - linAcc_y
         try
             % Compute spectral features.
             % Get frequency unit conversion factor.
@@ -407,6 +412,1468 @@ while hasdata(outputEnsemble)
         % Append computed results to the frame table.
         frame = [frame, ...
             table({linAcc_yTT_ps_spec},'VariableNames',"linAcc_yTT_ps_spec")];
+
+%--------------------------------------------------------------
+
+
+        %% PowerSpectrum - linAcc_z
+        try
+            % Get units to use in computed spectrum.
+            tuReal = "seconds";
+            tuTime = tuReal;
+
+            % Compute effective sampling rate.
+            tNumeric = time2num(linAcc_zTT.Time,tuReal);
+            [Fs,irregular] = effectivefs(tNumeric);
+            Ts = 1/Fs;
+
+            % Resample non-uniform signals.
+            x = linAcc_zTT.Var1;
+            if irregular
+                x = resample(x,tNumeric,Fs,'linear');
+            end
+
+            % Compute the autoregressive model.
+            data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
+            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
+            model = ar(data,12,arOpt);
+
+            % Compute the power spectrum.
+            f = linspace(0,12.5,1000);
+            f = f*funitconv('Hz','cycles/TimeUnit','seconds');
+            [ps,w] = spectrum(model,2*pi*f);
+            ps = reshape(ps, numel(ps), 1);
+
+            % Convert frequency unit.
+            factor = funitconv('rad/TimeUnit', 'Hz', 'seconds');
+            w = factor*w;
+            Fs = 2*pi*factor*Fs;
+
+            % Remove frequencies above Nyquist frequency.
+            I = w<=(Fs/2+1e4*eps);
+            w = w(I);
+            ps = ps(I);
+
+            % Configure the computed spectrum.
+            ps = table(w, ps, 'VariableNames', ["Frequency", "SpectrumData"]);
+            ps.Properties.VariableUnits = ["Hz", ""];
+            ps = addprop(ps, {'SampleFrequency'}, {'table'});
+            ps.Properties.CustomProperties.SampleFrequency = Fs;
+            linAcc_zTT_ps = ps;
+        catch
+            linAcc_zTT_ps = table(NaN, NaN, 'VariableNames', ["Frequency", "SpectrumData"]);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({linAcc_zTT_ps},'VariableNames',"linAcc_zTT_ps")];
+
+        %% SignalFeatures - linAcc_z
+        try
+            % Compute signal features.
+            inputSignal = linAcc_zTT.Var1;
+            ClearanceFactor = max(abs(inputSignal))/(mean(sqrt(abs(inputSignal)))^2);
+            CrestFactor = peak2rms(inputSignal);
+            ImpulseFactor = max(abs(inputSignal))/mean(abs(inputSignal));
+            Kurtosis = kurtosis(inputSignal);
+            Mean = mean(inputSignal,'omitnan');
+            PeakValue = max(abs(inputSignal));
+            RMS = rms(inputSignal,'omitnan');
+            ShapeFactor = rms(inputSignal,'omitnan')/mean(abs(inputSignal),'omitnan');
+            Skewness = skewness(inputSignal);
+            Std = std(inputSignal,'omitnan');
+
+            % Concatenate signal features.
+            featureValues = [ClearanceFactor,CrestFactor,ImpulseFactor,Kurtosis,Mean,PeakValue,RMS,ShapeFactor,Skewness,Std];
+
+            % Package computed features into a table.
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            linAcc_zTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,10);
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            linAcc_zTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({linAcc_zTT_sigstats},'VariableNames',"linAcc_zTT_sigstats")];
+
+        %% SpectrumFeatures - linAcc_z
+        try
+            % Compute spectral features.
+            % Get frequency unit conversion factor.
+            factor = funitconv('Hz', 'rad/TimeUnit', 'seconds');
+            ps = linAcc_zTT_ps.SpectrumData;
+            w = linAcc_zTT_ps.Frequency;
+            w = factor*w;
+            mask_1 = (w>=factor*1) & (w<=factor*10);
+            ps = ps(mask_1);
+            w = w(mask_1);
+
+            % Compute spectral peaks.
+            [peakAmp,peakFreq] = findpeaks(ps,w/factor,'MinPeakHeight',-Inf, ...
+                'MinPeakProminence',0,'MinPeakDistance',0.001,'SortStr','descend','NPeaks',2);
+            peakAmp = [peakAmp(:); NaN(2-numel(peakAmp),1)];
+            peakFreq = [peakFreq(:); NaN(2-numel(peakFreq),1)];
+
+            % Extract individual feature values.
+            PeakAmp1 = peakAmp(1);
+            PeakAmp2 = peakAmp(2);
+            PeakFreq1 = peakFreq(1);
+            PeakFreq2 = peakFreq(2);
+            BandPower = trapz(w/factor,ps);
+
+            % Concatenate signal features.
+            featureValues = [PeakAmp1,PeakAmp2,PeakFreq1,PeakFreq2,BandPower];
+
+            % Package computed features into a table.
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            linAcc_zTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,5);
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            linAcc_zTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({linAcc_zTT_ps_spec},'VariableNames',"linAcc_zTT_ps_spec")];
+
+
+        %------------------------------------------------------------------------------------
+
+
+        %% PowerSpectrum - angVel_x
+        try
+            % Get units to use in computed spectrum.
+            tuReal = "seconds";
+            tuTime = tuReal;
+
+            % Compute effective sampling rate.
+            tNumeric = time2num(angVel_xTT.Time,tuReal);
+            [Fs,irregular] = effectivefs(tNumeric);
+            Ts = 1/Fs;
+
+            % Resample non-uniform signals.
+            x = angVel_xTT.Var1;
+            if irregular
+                x = resample(x,tNumeric,Fs,'linear');
+            end
+
+            % Compute the autoregressive model.
+            data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
+            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
+            model = ar(data,12,arOpt);
+
+            % Compute the power spectrum.
+            f = linspace(0,12.5,1000);
+            f = f*funitconv('Hz','cycles/TimeUnit','seconds');
+            [ps,w] = spectrum(model,2*pi*f);
+            ps = reshape(ps, numel(ps), 1);
+
+            % Convert frequency unit.
+            factor = funitconv('rad/TimeUnit', 'Hz', 'seconds');
+            w = factor*w;
+            Fs = 2*pi*factor*Fs;
+
+            % Remove frequencies above Nyquist frequency.
+            I = w<=(Fs/2+1e4*eps);
+            w = w(I);
+            ps = ps(I);
+
+            % Configure the computed spectrum.
+            ps = table(w, ps, 'VariableNames', ["Frequency", "SpectrumData"]);
+            ps.Properties.VariableUnits = ["Hz", ""];
+            ps = addprop(ps, {'SampleFrequency'}, {'table'});
+            ps.Properties.CustomProperties.SampleFrequency = Fs;
+            angVel_xTT_ps = ps;
+        catch
+            angVel_xTT_ps = table(NaN, NaN, 'VariableNames', ["Frequency", "SpectrumData"]);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({angVel_xTT_ps},'VariableNames',"angVel_xTT_ps")];
+
+        %% SignalFeatures - angVel_x
+        try
+            % Compute signal features.
+            inputSignal = angVel_xTT.Var1;
+            ClearanceFactor = max(abs(inputSignal))/(mean(sqrt(abs(inputSignal)))^2);
+            CrestFactor = peak2rms(inputSignal);
+            ImpulseFactor = max(abs(inputSignal))/mean(abs(inputSignal));
+            Kurtosis = kurtosis(inputSignal);
+            Mean = mean(inputSignal,'omitnan');
+            PeakValue = max(abs(inputSignal));
+            RMS = rms(inputSignal,'omitnan');
+            ShapeFactor = rms(inputSignal,'omitnan')/mean(abs(inputSignal),'omitnan');
+            Skewness = skewness(inputSignal);
+            Std = std(inputSignal,'omitnan');
+
+            % Concatenate signal features.
+            featureValues = [ClearanceFactor,CrestFactor,ImpulseFactor,Kurtosis,Mean,PeakValue,RMS,ShapeFactor,Skewness,Std];
+
+            % Package computed features into a table.
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            angVel_xTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,10);
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            angVel_xTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({angVel_xTT_sigstats},'VariableNames',"angVel_xTT_sigstats")];
+
+        %% SpectrumFeatures - angVel_x
+        try
+            % Compute spectral features.
+            % Get frequency unit conversion factor.
+            factor = funitconv('Hz', 'rad/TimeUnit', 'seconds');
+            ps = angVel_xTT_ps.SpectrumData;
+            w = angVel_xTT_ps.Frequency;
+            w = factor*w;
+            mask_1 = (w>=factor*1) & (w<=factor*10);
+            ps = ps(mask_1);
+            w = w(mask_1);
+
+            % Compute spectral peaks.
+            [peakAmp,peakFreq] = findpeaks(ps,w/factor,'MinPeakHeight',-Inf, ...
+                'MinPeakProminence',0,'MinPeakDistance',0.001,'SortStr','descend','NPeaks',2);
+            peakAmp = [peakAmp(:); NaN(2-numel(peakAmp),1)];
+            peakFreq = [peakFreq(:); NaN(2-numel(peakFreq),1)];
+
+            % Extract individual feature values.
+            PeakAmp1 = peakAmp(1);
+            PeakAmp2 = peakAmp(2);
+            PeakFreq1 = peakFreq(1);
+            PeakFreq2 = peakFreq(2);
+            BandPower = trapz(w/factor,ps);
+
+            % Concatenate signal features.
+            featureValues = [PeakAmp1,PeakAmp2,PeakFreq1,PeakFreq2,BandPower];
+
+            % Package computed features into a table.
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            angVel_xTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,5);
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            angVel_xTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({angVel_xTT_ps_spec},'VariableNames',"angVel_xTT_ps_spec")];
+
+
+        %-----------------------------------------------------------------------------------
+
+        %% PowerSpectrum - angVel_y
+        try
+            % Get units to use in computed spectrum.
+            tuReal = "seconds";
+            tuTime = tuReal;
+
+            % Compute effective sampling rate.
+            tNumeric = time2num(angVel_yTT.Time,tuReal);
+            [Fs,irregular] = effectivefs(tNumeric);
+            Ts = 1/Fs;
+
+            % Resample non-uniform signals.
+            x = angVel_yTT.Var1;
+            if irregular
+                x = resample(x,tNumeric,Fs,'linear');
+            end
+
+            % Compute the autoregressive model.
+            data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
+            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
+            model = ar(data,12,arOpt);
+
+            % Compute the power spectrum.
+            f = linspace(0,12.5,1000);
+            f = f*funitconv('Hz','cycles/TimeUnit','seconds');
+            [ps,w] = spectrum(model,2*pi*f);
+            ps = reshape(ps, numel(ps), 1);
+
+            % Convert frequency unit.
+            factor = funitconv('rad/TimeUnit', 'Hz', 'seconds');
+            w = factor*w;
+            Fs = 2*pi*factor*Fs;
+
+            % Remove frequencies above Nyquist frequency.
+            I = w<=(Fs/2+1e4*eps);
+            w = w(I);
+            ps = ps(I);
+
+            % Configure the computed spectrum.
+            ps = table(w, ps, 'VariableNames', ["Frequency", "SpectrumData"]);
+            ps.Properties.VariableUnits = ["Hz", ""];
+            ps = addprop(ps, {'SampleFrequency'}, {'table'});
+            ps.Properties.CustomProperties.SampleFrequency = Fs;
+            angVel_yTT_ps = ps;
+        catch
+            angVel_yTT_ps = table(NaN, NaN, 'VariableNames', ["Frequency", "SpectrumData"]);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({angVel_yTT_ps},'VariableNames',"angVel_yTT_ps")];
+
+        %% SignalFeatures - angVel_y
+        try
+            % Compute signal features.
+            inputSignal = angVel_yTT.Var1;
+            ClearanceFactor = max(abs(inputSignal))/(mean(sqrt(abs(inputSignal)))^2);
+            CrestFactor = peak2rms(inputSignal);
+            ImpulseFactor = max(abs(inputSignal))/mean(abs(inputSignal));
+            Kurtosis = kurtosis(inputSignal);
+            Mean = mean(inputSignal,'omitnan');
+            PeakValue = max(abs(inputSignal));
+            RMS = rms(inputSignal,'omitnan');
+            ShapeFactor = rms(inputSignal,'omitnan')/mean(abs(inputSignal),'omitnan');
+            Skewness = skewness(inputSignal);
+            Std = std(inputSignal,'omitnan');
+
+            % Concatenate signal features.
+            featureValues = [ClearanceFactor,CrestFactor,ImpulseFactor,Kurtosis,Mean,PeakValue,RMS,ShapeFactor,Skewness,Std];
+
+            % Package computed features into a table.
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            angVel_yTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,10);
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            angVel_yTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({angVel_yTT_sigstats},'VariableNames',"angVel_yTT_sigstats")];
+
+        %% SpectrumFeatures - angVel_y
+        try
+            % Compute spectral features.
+            % Get frequency unit conversion factor.
+            factor = funitconv('Hz', 'rad/TimeUnit', 'seconds');
+            ps = angVel_yTT_ps.SpectrumData;
+            w = angVel_yTT_ps.Frequency;
+            w = factor*w;
+            mask_1 = (w>=factor*1) & (w<=factor*10);
+            ps = ps(mask_1);
+            w = w(mask_1);
+
+            % Compute spectral peaks.
+            [peakAmp,peakFreq] = findpeaks(ps,w/factor,'MinPeakHeight',-Inf, ...
+                'MinPeakProminence',0,'MinPeakDistance',0.001,'SortStr','descend','NPeaks',2);
+            peakAmp = [peakAmp(:); NaN(2-numel(peakAmp),1)];
+            peakFreq = [peakFreq(:); NaN(2-numel(peakFreq),1)];
+
+            % Extract individual feature values.
+            PeakAmp1 = peakAmp(1);
+            PeakAmp2 = peakAmp(2);
+            PeakFreq1 = peakFreq(1);
+            PeakFreq2 = peakFreq(2);
+            BandPower = trapz(w/factor,ps);
+
+            % Concatenate signal features.
+            featureValues = [PeakAmp1,PeakAmp2,PeakFreq1,PeakFreq2,BandPower];
+
+            % Package computed features into a table.
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            angVel_yTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,5);
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            angVel_yTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({angVel_yTT_ps_spec},'VariableNames',"angVel_yTT_ps_spec")];
+
+
+
+        %--------------------------------------------------------------------
+
+
+        %% PowerSpectrum - angVel_z
+        try
+            % Get units to use in computed spectrum.
+            tuReal = "seconds";
+            tuTime = tuReal;
+
+            % Compute effective sampling rate.
+            tNumeric = time2num(angVel_zTT.Time,tuReal);
+            [Fs,irregular] = effectivefs(tNumeric);
+            Ts = 1/Fs;
+
+            % Resample non-uniform signals.
+            x = angVel_zTT.Var1;
+            if irregular
+                x = resample(x,tNumeric,Fs,'linear');
+            end
+
+            % Compute the autoregressive model.
+            data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
+            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
+            model = ar(data,12,arOpt);
+
+            % Compute the power spectrum.
+            f = linspace(0,12.5,1000);
+            f = f*funitconv('Hz','cycles/TimeUnit','seconds');
+            [ps,w] = spectrum(model,2*pi*f);
+            ps = reshape(ps, numel(ps), 1);
+
+            % Convert frequency unit.
+            factor = funitconv('rad/TimeUnit', 'Hz', 'seconds');
+            w = factor*w;
+            Fs = 2*pi*factor*Fs;
+
+            % Remove frequencies above Nyquist frequency.
+            I = w<=(Fs/2+1e4*eps);
+            w = w(I);
+            ps = ps(I);
+
+            % Configure the computed spectrum.
+            ps = table(w, ps, 'VariableNames', ["Frequency", "SpectrumData"]);
+            ps.Properties.VariableUnits = ["Hz", ""];
+            ps = addprop(ps, {'SampleFrequency'}, {'table'});
+            ps.Properties.CustomProperties.SampleFrequency = Fs;
+            angVel_zTT_ps = ps;
+        catch
+            angVel_zTT_ps = table(NaN, NaN, 'VariableNames', ["Frequency", "SpectrumData"]);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({angVel_zTT_ps},'VariableNames',"angVel_zTT_ps")];
+
+        %% SignalFeatures - angVel_z
+        try
+            % Compute signal features.
+            inputSignal = angVel_zTT.Var1;
+            ClearanceFactor = max(abs(inputSignal))/(mean(sqrt(abs(inputSignal)))^2);
+            CrestFactor = peak2rms(inputSignal);
+            ImpulseFactor = max(abs(inputSignal))/mean(abs(inputSignal));
+            Kurtosis = kurtosis(inputSignal);
+            Mean = mean(inputSignal,'omitnan');
+            PeakValue = max(abs(inputSignal));
+            RMS = rms(inputSignal,'omitnan');
+            ShapeFactor = rms(inputSignal,'omitnan')/mean(abs(inputSignal),'omitnan');
+            Skewness = skewness(inputSignal);
+            Std = std(inputSignal,'omitnan');
+
+            % Concatenate signal features.
+            featureValues = [ClearanceFactor,CrestFactor,ImpulseFactor,Kurtosis,Mean,PeakValue,RMS,ShapeFactor,Skewness,Std];
+
+            % Package computed features into a table.
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            angVel_zTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,10);
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            angVel_zTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({angVel_zTT_sigstats},'VariableNames',"angVel_zTT_sigstats")];
+
+        %% SpectrumFeatures - angVel_z
+        try
+            % Compute spectral features.
+            % Get frequency unit conversion factor.
+            factor = funitconv('Hz', 'rad/TimeUnit', 'seconds');
+            ps = angVel_zTT_ps.SpectrumData;
+            w = angVel_zTT_ps.Frequency;
+            w = factor*w;
+            mask_1 = (w>=factor*1) & (w<=factor*10);
+            ps = ps(mask_1);
+            w = w(mask_1);
+
+            % Compute spectral peaks.
+            [peakAmp,peakFreq] = findpeaks(ps,w/factor,'MinPeakHeight',-Inf, ...
+                'MinPeakProminence',0,'MinPeakDistance',0.001,'SortStr','descend','NPeaks',2);
+            peakAmp = [peakAmp(:); NaN(2-numel(peakAmp),1)];
+            peakFreq = [peakFreq(:); NaN(2-numel(peakFreq),1)];
+
+            % Extract individual feature values.
+            PeakAmp1 = peakAmp(1);
+            PeakAmp2 = peakAmp(2);
+            PeakFreq1 = peakFreq(1);
+            PeakFreq2 = peakFreq(2);
+            BandPower = trapz(w/factor,ps);
+
+            % Concatenate signal features.
+            featureValues = [PeakAmp1,PeakAmp2,PeakFreq1,PeakFreq2,BandPower];
+
+            % Package computed features into a table.
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            angVel_zTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,5);
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            angVel_zTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({angVel_zTT_ps_spec},'VariableNames',"angVel_zTT_ps_spec")];
+
+
+
+
+        %--------------------------------------------------------------------
+
+
+        %% PowerSpectrum - errVel_xTT
+        try
+            % Get units to use in computed spectrum.
+            tuReal = "seconds";
+            tuTime = tuReal;
+
+            % Compute effective sampling rate.
+            tNumeric = time2num(errVel_xTT.Time,tuReal);
+            [Fs,irregular] = effectivefs(tNumeric);
+            Ts = 1/Fs;
+
+            % Resample non-uniform signals.
+            x = errVel_xTT.Var1;
+            if irregular
+                x = resample(x,tNumeric,Fs,'linear');
+            end
+
+            % Compute the autoregressive model.
+            data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
+            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
+            model = ar(data,12,arOpt);
+
+            % Compute the power spectrum.
+            f = linspace(0,12.5,1000);
+            f = f*funitconv('Hz','cycles/TimeUnit','seconds');
+            [ps,w] = spectrum(model,2*pi*f);
+            ps = reshape(ps, numel(ps), 1);
+
+            % Convert frequency unit.
+            factor = funitconv('rad/TimeUnit', 'Hz', 'seconds');
+            w = factor*w;
+            Fs = 2*pi*factor*Fs;
+
+            % Remove frequencies above Nyquist frequency.
+            I = w<=(Fs/2+1e4*eps);
+            w = w(I);
+            ps = ps(I);
+
+            % Configure the computed spectrum.
+            ps = table(w, ps, 'VariableNames', ["Frequency", "SpectrumData"]);
+            ps.Properties.VariableUnits = ["Hz", ""];
+            ps = addprop(ps, {'SampleFrequency'}, {'table'});
+            ps.Properties.CustomProperties.SampleFrequency = Fs;
+            errVel_xTT_ps = ps;
+        catch
+            errVel_xTT_ps = table(NaN, NaN, 'VariableNames', ["Frequency", "SpectrumData"]);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({errVel_xTT_ps},'VariableNames',"errVel_xTT_ps")];
+
+        %% SignalFeatures - errVel_xTT
+        try
+            % Compute signal features.
+            inputSignal = errVel_xTT.Var1;
+            ClearanceFactor = max(abs(inputSignal))/(mean(sqrt(abs(inputSignal)))^2);
+            CrestFactor = peak2rms(inputSignal);
+            ImpulseFactor = max(abs(inputSignal))/mean(abs(inputSignal));
+            Kurtosis = kurtosis(inputSignal);
+            Mean = mean(inputSignal,'omitnan');
+            PeakValue = max(abs(inputSignal));
+            RMS = rms(inputSignal,'omitnan');
+            ShapeFactor = rms(inputSignal,'omitnan')/mean(abs(inputSignal),'omitnan');
+            Skewness = skewness(inputSignal);
+            Std = std(inputSignal,'omitnan');
+
+            % Concatenate signal features.
+            featureValues = [ClearanceFactor,CrestFactor,ImpulseFactor,Kurtosis,Mean,PeakValue,RMS,ShapeFactor,Skewness,Std];
+
+            % Package computed features into a table.
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            errVel_xTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,10);
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            errVel_xTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({errVel_xTT_sigstats},'VariableNames',"errVel_xTT_sigstats")];
+
+        %% SpectrumFeatures - errVel_xTT
+        try
+            % Compute spectral features.
+            % Get frequency unit conversion factor.
+            factor = funitconv('Hz', 'rad/TimeUnit', 'seconds');
+            ps = errVel_xTT_ps.SpectrumData;
+            w = errVel_xTT_ps.Frequency;
+            w = factor*w;
+            mask_1 = (w>=factor*1) & (w<=factor*10);
+            ps = ps(mask_1);
+            w = w(mask_1);
+
+            % Compute spectral peaks.
+            [peakAmp,peakFreq] = findpeaks(ps,w/factor,'MinPeakHeight',-Inf, ...
+                'MinPeakProminence',0,'MinPeakDistance',0.001,'SortStr','descend','NPeaks',2);
+            peakAmp = [peakAmp(:); NaN(2-numel(peakAmp),1)];
+            peakFreq = [peakFreq(:); NaN(2-numel(peakFreq),1)];
+
+            % Extract individual feature values.
+            PeakAmp1 = peakAmp(1);
+            PeakAmp2 = peakAmp(2);
+            PeakFreq1 = peakFreq(1);
+            PeakFreq2 = peakFreq(2);
+            BandPower = trapz(w/factor,ps);
+
+            % Concatenate signal features.
+            featureValues = [PeakAmp1,PeakAmp2,PeakFreq1,PeakFreq2,BandPower];
+
+            % Package computed features into a table.
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            errVel_xTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,5);
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            errVel_xTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({errVel_xTT_ps_spec},'VariableNames',"errVel_xTT_ps_spec")];
+
+
+
+
+        %--------------------------------------------------------------------
+
+        %% PowerSpectrum - errVel_yTT
+        try
+            % Get units to use in computed spectrum.
+            tuReal = "seconds";
+            tuTime = tuReal;
+
+            % Compute effective sampling rate.
+            tNumeric = time2num(errVel_yTT.Time,tuReal);
+            [Fs,irregular] = effectivefs(tNumeric);
+            Ts = 1/Fs;
+
+            % Resample non-uniform signals.
+            x = errVel_yTT.Var1;
+            if irregular
+                x = resample(x,tNumeric,Fs,'linear');
+            end
+
+            % Compute the autoregressive model.
+            data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
+            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
+            model = ar(data,12,arOpt);
+
+            % Compute the power spectrum.
+            f = linspace(0,12.5,1000);
+            f = f*funitconv('Hz','cycles/TimeUnit','seconds');
+            [ps,w] = spectrum(model,2*pi*f);
+            ps = reshape(ps, numel(ps), 1);
+
+            % Convert frequency unit.
+            factor = funitconv('rad/TimeUnit', 'Hz', 'seconds');
+            w = factor*w;
+            Fs = 2*pi*factor*Fs;
+
+            % Remove frequencies above Nyquist frequency.
+            I = w<=(Fs/2+1e4*eps);
+            w = w(I);
+            ps = ps(I);
+
+            % Configure the computed spectrum.
+            ps = table(w, ps, 'VariableNames', ["Frequency", "SpectrumData"]);
+            ps.Properties.VariableUnits = ["Hz", ""];
+            ps = addprop(ps, {'SampleFrequency'}, {'table'});
+            ps.Properties.CustomProperties.SampleFrequency = Fs;
+            errVel_yTT_ps = ps;
+        catch
+            errVel_yTT_ps = table(NaN, NaN, 'VariableNames', ["Frequency", "SpectrumData"]);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({errVel_yTT_ps},'VariableNames',"errVel_yTT_ps")];
+
+        %% SignalFeatures - errVel_yTT
+        try
+            % Compute signal features.
+            inputSignal = errVel_yTT.Var1;
+            ClearanceFactor = max(abs(inputSignal))/(mean(sqrt(abs(inputSignal)))^2);
+            CrestFactor = peak2rms(inputSignal);
+            ImpulseFactor = max(abs(inputSignal))/mean(abs(inputSignal));
+            Kurtosis = kurtosis(inputSignal);
+            Mean = mean(inputSignal,'omitnan');
+            PeakValue = max(abs(inputSignal));
+            RMS = rms(inputSignal,'omitnan');
+            ShapeFactor = rms(inputSignal,'omitnan')/mean(abs(inputSignal),'omitnan');
+            Skewness = skewness(inputSignal);
+            Std = std(inputSignal,'omitnan');
+
+            % Concatenate signal features.
+            featureValues = [ClearanceFactor,CrestFactor,ImpulseFactor,Kurtosis,Mean,PeakValue,RMS,ShapeFactor,Skewness,Std];
+
+            % Package computed features into a table.
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            errVel_yTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,10);
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            errVel_yTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({errVel_yTT_sigstats},'VariableNames',"errVel_yTT_sigstats")];
+
+        %% SpectrumFeatures - errVel_yTT
+        try
+            % Compute spectral features.
+            % Get frequency unit conversion factor.
+            factor = funitconv('Hz', 'rad/TimeUnit', 'seconds');
+            ps = errVel_yTT_ps.SpectrumData;
+            w = errVel_yTT_ps.Frequency;
+            w = factor*w;
+            mask_1 = (w>=factor*1) & (w<=factor*10);
+            ps = ps(mask_1);
+            w = w(mask_1);
+
+            % Compute spectral peaks.
+            [peakAmp,peakFreq] = findpeaks(ps,w/factor,'MinPeakHeight',-Inf, ...
+                'MinPeakProminence',0,'MinPeakDistance',0.001,'SortStr','descend','NPeaks',2);
+            peakAmp = [peakAmp(:); NaN(2-numel(peakAmp),1)];
+            peakFreq = [peakFreq(:); NaN(2-numel(peakFreq),1)];
+
+            % Extract individual feature values.
+            PeakAmp1 = peakAmp(1);
+            PeakAmp2 = peakAmp(2);
+            PeakFreq1 = peakFreq(1);
+            PeakFreq2 = peakFreq(2);
+            BandPower = trapz(w/factor,ps);
+
+            % Concatenate signal features.
+            featureValues = [PeakAmp1,PeakAmp2,PeakFreq1,PeakFreq2,BandPower];
+
+            % Package computed features into a table.
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            errVel_yTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,5);
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            errVel_yTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({errVel_yTT_ps_spec},'VariableNames',"errVel_yTT_ps_spec")];
+
+
+
+        %--------------------------------------------------------------------
+
+        %% PowerSpectrum - errVel_zTT
+        try
+            % Get units to use in computed spectrum.
+            tuReal = "seconds";
+            tuTime = tuReal;
+
+            % Compute effective sampling rate.
+            tNumeric = time2num(errVel_zTT.Time,tuReal);
+            [Fs,irregular] = effectivefs(tNumeric);
+            Ts = 1/Fs;
+
+            % Resample non-uniform signals.
+            x = errVel_zTT.Var1;
+            if irregular
+                x = resample(x,tNumeric,Fs,'linear');
+            end
+
+            % Compute the autoregressive model.
+            data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
+            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
+            model = ar(data,12,arOpt);
+
+            % Compute the power spectrum.
+            f = linspace(0,12.5,1000);
+            f = f*funitconv('Hz','cycles/TimeUnit','seconds');
+            [ps,w] = spectrum(model,2*pi*f);
+            ps = reshape(ps, numel(ps), 1);
+
+            % Convert frequency unit.
+            factor = funitconv('rad/TimeUnit', 'Hz', 'seconds');
+            w = factor*w;
+            Fs = 2*pi*factor*Fs;
+
+            % Remove frequencies above Nyquist frequency.
+            I = w<=(Fs/2+1e4*eps);
+            w = w(I);
+            ps = ps(I);
+
+            % Configure the computed spectrum.
+            ps = table(w, ps, 'VariableNames', ["Frequency", "SpectrumData"]);
+            ps.Properties.VariableUnits = ["Hz", ""];
+            ps = addprop(ps, {'SampleFrequency'}, {'table'});
+            ps.Properties.CustomProperties.SampleFrequency = Fs;
+            errVel_zTT_ps = ps;
+        catch
+            errVel_zTT_ps = table(NaN, NaN, 'VariableNames', ["Frequency", "SpectrumData"]);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({errVel_zTT_ps},'VariableNames',"errVel_zTT_ps")];
+
+        %% SignalFeatures - errVel_zTT
+        try
+            % Compute signal features.
+            inputSignal = errVel_zTT.Var1;
+            ClearanceFactor = max(abs(inputSignal))/(mean(sqrt(abs(inputSignal)))^2);
+            CrestFactor = peak2rms(inputSignal);
+            ImpulseFactor = max(abs(inputSignal))/mean(abs(inputSignal));
+            Kurtosis = kurtosis(inputSignal);
+            Mean = mean(inputSignal,'omitnan');
+            PeakValue = max(abs(inputSignal));
+            RMS = rms(inputSignal,'omitnan');
+            ShapeFactor = rms(inputSignal,'omitnan')/mean(abs(inputSignal),'omitnan');
+            Skewness = skewness(inputSignal);
+            Std = std(inputSignal,'omitnan');
+
+            % Concatenate signal features.
+            featureValues = [ClearanceFactor,CrestFactor,ImpulseFactor,Kurtosis,Mean,PeakValue,RMS,ShapeFactor,Skewness,Std];
+
+            % Package computed features into a table.
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            errVel_zTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,10);
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            errVel_zTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({errVel_zTT_sigstats},'VariableNames',"errVel_zTT_sigstats")];
+
+        %% SpectrumFeatures - errVel_zTT
+        try
+            % Compute spectral features.
+            % Get frequency unit conversion factor.
+            factor = funitconv('Hz', 'rad/TimeUnit', 'seconds');
+            ps = errVel_zTT_ps.SpectrumData;
+            w = errVel_zTT_ps.Frequency;
+            w = factor*w;
+            mask_1 = (w>=factor*1) & (w<=factor*10);
+            ps = ps(mask_1);
+            w = w(mask_1);
+
+            % Compute spectral peaks.
+            [peakAmp,peakFreq] = findpeaks(ps,w/factor,'MinPeakHeight',-Inf, ...
+                'MinPeakProminence',0,'MinPeakDistance',0.001,'SortStr','descend','NPeaks',2);
+            peakAmp = [peakAmp(:); NaN(2-numel(peakAmp),1)];
+            peakFreq = [peakFreq(:); NaN(2-numel(peakFreq),1)];
+
+            % Extract individual feature values.
+            PeakAmp1 = peakAmp(1);
+            PeakAmp2 = peakAmp(2);
+            PeakFreq1 = peakFreq(1);
+            PeakFreq2 = peakFreq(2);
+            BandPower = trapz(w/factor,ps);
+
+            % Concatenate signal features.
+            featureValues = [PeakAmp1,PeakAmp2,PeakFreq1,PeakFreq2,BandPower];
+
+            % Package computed features into a table.
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            errVel_zTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,5);
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            errVel_zTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({errVel_zTT_ps_spec},'VariableNames',"errVel_zTT_ps_spec")];
+
+
+
+
+
+
+
+        %--------------------------------------------------------------------
+
+        %% PowerSpectrum - altitudeTT
+        try
+            % Get units to use in computed spectrum.
+            tuReal = "seconds";
+            tuTime = tuReal;
+
+            % Compute effective sampling rate.
+            tNumeric = time2num(altitudeTT.Time,tuReal);
+            [Fs,irregular] = effectivefs(tNumeric);
+            Ts = 1/Fs;
+
+            % Resample non-uniform signals.
+            x = altitudeTT.Var1;
+            if irregular
+                x = resample(x,tNumeric,Fs,'linear');
+            end
+
+            % Compute the autoregressive model.
+            data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
+            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
+            model = ar(data,12,arOpt);
+
+            % Compute the power spectrum.
+            f = linspace(0,12.5,1000);
+            f = f*funitconv('Hz','cycles/TimeUnit','seconds');
+            [ps,w] = spectrum(model,2*pi*f);
+            ps = reshape(ps, numel(ps), 1);
+
+            % Convert frequency unit.
+            factor = funitconv('rad/TimeUnit', 'Hz', 'seconds');
+            w = factor*w;
+            Fs = 2*pi*factor*Fs;
+
+            % Remove frequencies above Nyquist frequency.
+            I = w<=(Fs/2+1e4*eps);
+            w = w(I);
+            ps = ps(I);
+
+            % Configure the computed spectrum.
+            ps = table(w, ps, 'VariableNames', ["Frequency", "SpectrumData"]);
+            ps.Properties.VariableUnits = ["Hz", ""];
+            ps = addprop(ps, {'SampleFrequency'}, {'table'});
+            ps.Properties.CustomProperties.SampleFrequency = Fs;
+            altitudeTT_ps = ps;
+        catch
+            altitudeTT_ps = table(NaN, NaN, 'VariableNames', ["Frequency", "SpectrumData"]);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({altitudeTT_ps},'VariableNames',"altitudeTT_ps")];
+
+        %% SignalFeatures - altitudeTT
+        try
+            % Compute signal features.
+            inputSignal = altitudeTT.Var1;
+            ClearanceFactor = max(abs(inputSignal))/(mean(sqrt(abs(inputSignal)))^2);
+            CrestFactor = peak2rms(inputSignal);
+            ImpulseFactor = max(abs(inputSignal))/mean(abs(inputSignal));
+            Kurtosis = kurtosis(inputSignal);
+            Mean = mean(inputSignal,'omitnan');
+            PeakValue = max(abs(inputSignal));
+            RMS = rms(inputSignal,'omitnan');
+            ShapeFactor = rms(inputSignal,'omitnan')/mean(abs(inputSignal),'omitnan');
+            Skewness = skewness(inputSignal);
+            Std = std(inputSignal,'omitnan');
+
+            % Concatenate signal features.
+            featureValues = [ClearanceFactor,CrestFactor,ImpulseFactor,Kurtosis,Mean,PeakValue,RMS,ShapeFactor,Skewness,Std];
+
+            % Package computed features into a table.
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            altitudeTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,10);
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            altitudeTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({altitudeTT_sigstats},'VariableNames',"altitudeTT_sigstats")];
+
+        %% SpectrumFeatures - altitudeTT
+        try
+            % Compute spectral features.
+            % Get frequency unit conversion factor.
+            factor = funitconv('Hz', 'rad/TimeUnit', 'seconds');
+            ps = altitudeTT_ps.SpectrumData;
+            w = altitudeTT_ps.Frequency;
+            w = factor*w;
+            mask_1 = (w>=factor*1) & (w<=factor*10);
+            ps = ps(mask_1);
+            w = w(mask_1);
+
+            % Compute spectral peaks.
+            [peakAmp,peakFreq] = findpeaks(ps,w/factor,'MinPeakHeight',-Inf, ...
+                'MinPeakProminence',0,'MinPeakDistance',0.001,'SortStr','descend','NPeaks',2);
+            peakAmp = [peakAmp(:); NaN(2-numel(peakAmp),1)];
+            peakFreq = [peakFreq(:); NaN(2-numel(peakFreq),1)];
+
+            % Extract individual feature values.
+            PeakAmp1 = peakAmp(1);
+            PeakAmp2 = peakAmp(2);
+            PeakFreq1 = peakFreq(1);
+            PeakFreq2 = peakFreq(2);
+            BandPower = trapz(w/factor,ps);
+
+            % Concatenate signal features.
+            featureValues = [PeakAmp1,PeakAmp2,PeakFreq1,PeakFreq2,BandPower];
+
+            % Package computed features into a table.
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            altitudeTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,5);
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            altitudeTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({altitudeTT_ps_spec},'VariableNames',"altitudeTT_ps_spec")];
+
+
+
+
+
+        %---------------------------------------------------------------------
+
+
+
+
+        %% PowerSpectrum - latitudeTT
+        try
+            % Get units to use in computed spectrum.
+            tuReal = "seconds";
+            tuTime = tuReal;
+
+            % Compute effective sampling rate.
+            tNumeric = time2num(latitudeTT.Time,tuReal);
+            [Fs,irregular] = effectivefs(tNumeric);
+            Ts = 1/Fs;
+
+            % Resample non-uniform signals.
+            x = latitudeTT.Var1;
+            if irregular
+                x = resample(x,tNumeric,Fs,'linear');
+            end
+
+            % Compute the autoregressive model.
+            data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
+            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
+            model = ar(data,12,arOpt);
+
+            % Compute the power spectrum.
+            f = linspace(0,12.5,1000);
+            f = f*funitconv('Hz','cycles/TimeUnit','seconds');
+            [ps,w] = spectrum(model,2*pi*f);
+            ps = reshape(ps, numel(ps), 1);
+
+            % Convert frequency unit.
+            factor = funitconv('rad/TimeUnit', 'Hz', 'seconds');
+            w = factor*w;
+            Fs = 2*pi*factor*Fs;
+
+            % Remove frequencies above Nyquist frequency.
+            I = w<=(Fs/2+1e4*eps);
+            w = w(I);
+            ps = ps(I);
+
+            % Configure the computed spectrum.
+            ps = table(w, ps, 'VariableNames', ["Frequency", "SpectrumData"]);
+            ps.Properties.VariableUnits = ["Hz", ""];
+            ps = addprop(ps, {'SampleFrequency'}, {'table'});
+            ps.Properties.CustomProperties.SampleFrequency = Fs;
+            latitudeTT_ps = ps;
+        catch
+            latitudeTT_ps = table(NaN, NaN, 'VariableNames', ["Frequency", "SpectrumData"]);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({latitudeTT_ps},'VariableNames',"latitudeTT_ps")];
+
+        %% SignalFeatures - latitudeTT
+        try
+            % Compute signal features.
+            inputSignal = latitudeTT.Var1;
+            ClearanceFactor = max(abs(inputSignal))/(mean(sqrt(abs(inputSignal)))^2);
+            CrestFactor = peak2rms(inputSignal);
+            ImpulseFactor = max(abs(inputSignal))/mean(abs(inputSignal));
+            Kurtosis = kurtosis(inputSignal);
+            Mean = mean(inputSignal,'omitnan');
+            PeakValue = max(abs(inputSignal));
+            RMS = rms(inputSignal,'omitnan');
+            ShapeFactor = rms(inputSignal,'omitnan')/mean(abs(inputSignal),'omitnan');
+            Skewness = skewness(inputSignal);
+            Std = std(inputSignal,'omitnan');
+
+            % Concatenate signal features.
+            featureValues = [ClearanceFactor,CrestFactor,ImpulseFactor,Kurtosis,Mean,PeakValue,RMS,ShapeFactor,Skewness,Std];
+
+            % Package computed features into a table.
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            latitudeTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,10);
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            latitudeTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({latitudeTT_sigstats},'VariableNames',"latitudeTT_sigstats")];
+
+        %% SpectrumFeatures - latitudeTT
+        try
+            % Compute spectral features.
+            % Get frequency unit conversion factor.
+            factor = funitconv('Hz', 'rad/TimeUnit', 'seconds');
+            ps = latitudeTT_ps.SpectrumData;
+            w = latitudeTT_ps.Frequency;
+            w = factor*w;
+            mask_1 = (w>=factor*1) & (w<=factor*10);
+            ps = ps(mask_1);
+            w = w(mask_1);
+
+            % Compute spectral peaks.
+            [peakAmp,peakFreq] = findpeaks(ps,w/factor,'MinPeakHeight',-Inf, ...
+                'MinPeakProminence',0,'MinPeakDistance',0.001,'SortStr','descend','NPeaks',2);
+            peakAmp = [peakAmp(:); NaN(2-numel(peakAmp),1)];
+            peakFreq = [peakFreq(:); NaN(2-numel(peakFreq),1)];
+
+            % Extract individual feature values.
+            PeakAmp1 = peakAmp(1);
+            PeakAmp2 = peakAmp(2);
+            PeakFreq1 = peakFreq(1);
+            PeakFreq2 = peakFreq(2);
+            BandPower = trapz(w/factor,ps);
+
+            % Concatenate signal features.
+            featureValues = [PeakAmp1,PeakAmp2,PeakFreq1,PeakFreq2,BandPower];
+
+            % Package computed features into a table.
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            latitudeTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,5);
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            latitudeTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({latitudeTT_ps_spec},'VariableNames',"latitudeTT_ps_spec")];
+
+
+%-----------------------------------------------------------------------------
+
+
+        %% PowerSpectrum - longitudeTT
+        try
+            % Get units to use in computed spectrum.
+            tuReal = "seconds";
+            tuTime = tuReal;
+
+            % Compute effective sampling rate.
+            tNumeric = time2num(longitudeTT.Time,tuReal);
+            [Fs,irregular] = effectivefs(tNumeric);
+            Ts = 1/Fs;
+
+            % Resample non-uniform signals.
+            x = longitudeTT.Var1;
+            if irregular
+                x = resample(x,tNumeric,Fs,'linear');
+            end
+
+            % Compute the autoregressive model.
+            data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
+            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
+            model = ar(data,12,arOpt);
+
+            % Compute the power spectrum.
+            f = linspace(0,12.5,1000);
+            f = f*funitconv('Hz','cycles/TimeUnit','seconds');
+            [ps,w] = spectrum(model,2*pi*f);
+            ps = reshape(ps, numel(ps), 1);
+
+            % Convert frequency unit.
+            factor = funitconv('rad/TimeUnit', 'Hz', 'seconds');
+            w = factor*w;
+            Fs = 2*pi*factor*Fs;
+
+            % Remove frequencies above Nyquist frequency.
+            I = w<=(Fs/2+1e4*eps);
+            w = w(I);
+            ps = ps(I);
+
+            % Configure the computed spectrum.
+            ps = table(w, ps, 'VariableNames', ["Frequency", "SpectrumData"]);
+            ps.Properties.VariableUnits = ["Hz", ""];
+            ps = addprop(ps, {'SampleFrequency'}, {'table'});
+            ps.Properties.CustomProperties.SampleFrequency = Fs;
+            longitudeTT_ps = ps;
+        catch
+            longitudeTT_ps = table(NaN, NaN, 'VariableNames', ["Frequency", "SpectrumData"]);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({longitudeTT_ps},'VariableNames',"longitudeTT_ps")];
+
+        %% SignalFeatures - longitudeTT
+        try
+            % Compute signal features.
+            inputSignal = longitudeTT.Var1;
+            ClearanceFactor = max(abs(inputSignal))/(mean(sqrt(abs(inputSignal)))^2);
+            CrestFactor = peak2rms(inputSignal);
+            ImpulseFactor = max(abs(inputSignal))/mean(abs(inputSignal));
+            Kurtosis = kurtosis(inputSignal);
+            Mean = mean(inputSignal,'omitnan');
+            PeakValue = max(abs(inputSignal));
+            RMS = rms(inputSignal,'omitnan');
+            ShapeFactor = rms(inputSignal,'omitnan')/mean(abs(inputSignal),'omitnan');
+            Skewness = skewness(inputSignal);
+            Std = std(inputSignal,'omitnan');
+
+            % Concatenate signal features.
+            featureValues = [ClearanceFactor,CrestFactor,ImpulseFactor,Kurtosis,Mean,PeakValue,RMS,ShapeFactor,Skewness,Std];
+
+            % Package computed features into a table.
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            longitudeTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,10);
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            longitudeTT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({longitudeTT_sigstats},'VariableNames',"longitudeTT_sigstats")];
+
+        %% SpectrumFeatures - longitudeTT
+        try
+            % Compute spectral features.
+            % Get frequency unit conversion factor.
+            factor = funitconv('Hz', 'rad/TimeUnit', 'seconds');
+            ps = longitudeTT_ps.SpectrumData;
+            w = longitudeTT_ps.Frequency;
+            w = factor*w;
+            mask_1 = (w>=factor*1) & (w<=factor*10);
+            ps = ps(mask_1);
+            w = w(mask_1);
+
+            % Compute spectral peaks.
+            [peakAmp,peakFreq] = findpeaks(ps,w/factor,'MinPeakHeight',-Inf, ...
+                'MinPeakProminence',0,'MinPeakDistance',0.001,'SortStr','descend','NPeaks',2);
+            peakAmp = [peakAmp(:); NaN(2-numel(peakAmp),1)];
+            peakFreq = [peakFreq(:); NaN(2-numel(peakFreq),1)];
+
+            % Extract individual feature values.
+            PeakAmp1 = peakAmp(1);
+            PeakAmp2 = peakAmp(2);
+            PeakFreq1 = peakFreq(1);
+            PeakFreq2 = peakFreq(2);
+            BandPower = trapz(w/factor,ps);
+
+            % Concatenate signal features.
+            featureValues = [PeakAmp1,PeakAmp2,PeakFreq1,PeakFreq2,BandPower];
+
+            % Package computed features into a table.
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            longitudeTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,5);
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            longitudeTT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({longitudeTT_ps_spec},'VariableNames',"longitudeTT_ps_spec")];
+
+
+
+        %-----------------------------------------------------------------------------
+
+        %% PowerSpectrum - err_roll_TT
+        try
+            % Get units to use in computed spectrum.
+            tuReal = "seconds";
+            tuTime = tuReal;
+
+            % Compute effective sampling rate.
+            tNumeric = time2num(err_roll_TT.Time,tuReal);
+            [Fs,irregular] = effectivefs(tNumeric);
+            Ts = 1/Fs;
+
+            % Resample non-uniform signals.
+            x = err_roll_TT.Var1;
+            if irregular
+                x = resample(x,tNumeric,Fs,'linear');
+            end
+
+            % Compute the autoregressive model.
+            data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
+            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
+            model = ar(data,12,arOpt);
+
+            % Compute the power spectrum.
+            f = linspace(0,12.5,1000);
+            f = f*funitconv('Hz','cycles/TimeUnit','seconds');
+            [ps,w] = spectrum(model,2*pi*f);
+            ps = reshape(ps, numel(ps), 1);
+
+            % Convert frequency unit.
+            factor = funitconv('rad/TimeUnit', 'Hz', 'seconds');
+            w = factor*w;
+            Fs = 2*pi*factor*Fs;
+
+            % Remove frequencies above Nyquist frequency.
+            I = w<=(Fs/2+1e4*eps);
+            w = w(I);
+            ps = ps(I);
+
+            % Configure the computed spectrum.
+            ps = table(w, ps, 'VariableNames', ["Frequency", "SpectrumData"]);
+            ps.Properties.VariableUnits = ["Hz", ""];
+            ps = addprop(ps, {'SampleFrequency'}, {'table'});
+            ps.Properties.CustomProperties.SampleFrequency = Fs;
+            err_roll_TT_ps = ps;
+        catch
+            err_roll_TT_ps = table(NaN, NaN, 'VariableNames', ["Frequency", "SpectrumData"]);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({err_roll_TT_ps},'VariableNames',"err_roll_TT_ps")];
+
+        %% SignalFeatures - err_roll_TT
+        try
+            % Compute signal features.
+            inputSignal = err_roll_TT.Var1;
+            ClearanceFactor = max(abs(inputSignal))/(mean(sqrt(abs(inputSignal)))^2);
+            CrestFactor = peak2rms(inputSignal);
+            ImpulseFactor = max(abs(inputSignal))/mean(abs(inputSignal));
+            Kurtosis = kurtosis(inputSignal);
+            Mean = mean(inputSignal,'omitnan');
+            PeakValue = max(abs(inputSignal));
+            RMS = rms(inputSignal,'omitnan');
+            ShapeFactor = rms(inputSignal,'omitnan')/mean(abs(inputSignal),'omitnan');
+            Skewness = skewness(inputSignal);
+            Std = std(inputSignal,'omitnan');
+
+            % Concatenate signal features.
+            featureValues = [ClearanceFactor,CrestFactor,ImpulseFactor,Kurtosis,Mean,PeakValue,RMS,ShapeFactor,Skewness,Std];
+
+            % Package computed features into a table.
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            err_roll_TT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,10);
+            featureNames = ["ClearanceFactor","CrestFactor","ImpulseFactor","Kurtosis","Mean","PeakValue","RMS","ShapeFactor","Skewness","Std"];
+            err_roll_TT_sigstats = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({err_roll_TT_sigstats},'VariableNames',"err_roll_TT_sigstats")];
+
+        %% SpectrumFeatures - err_roll_TT
+        try
+            % Compute spectral features.
+            % Get frequency unit conversion factor.
+            factor = funitconv('Hz', 'rad/TimeUnit', 'seconds');
+            ps = err_roll_TT_ps.SpectrumData;
+            w = err_roll_TT_ps.Frequency;
+            w = factor*w;
+            mask_1 = (w>=factor*1) & (w<=factor*10);
+            ps = ps(mask_1);
+            w = w(mask_1);
+
+            % Compute spectral peaks.
+            [peakAmp,peakFreq] = findpeaks(ps,w/factor,'MinPeakHeight',-Inf, ...
+                'MinPeakProminence',0,'MinPeakDistance',0.001,'SortStr','descend','NPeaks',2);
+            peakAmp = [peakAmp(:); NaN(2-numel(peakAmp),1)];
+            peakFreq = [peakFreq(:); NaN(2-numel(peakFreq),1)];
+
+            % Extract individual feature values.
+            PeakAmp1 = peakAmp(1);
+            PeakAmp2 = peakAmp(2);
+            PeakFreq1 = peakFreq(1);
+            PeakFreq2 = peakFreq(2);
+            BandPower = trapz(w/factor,ps);
+
+            % Concatenate signal features.
+            featureValues = [PeakAmp1,PeakAmp2,PeakFreq1,PeakFreq2,BandPower];
+
+            % Package computed features into a table.
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            err_roll_TT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        catch
+            % Package computed features into a table.
+            featureValues = NaN(1,5);
+            featureNames = ["PeakAmp1","PeakAmp2","PeakFreq1","PeakFreq2","BandPower"];
+            err_roll_TT_ps_spec = array2table(featureValues,'VariableNames',featureNames);
+        end
+
+        % Append computed results to the frame table.
+        frame = [frame, ...
+            table({err_roll_TT_ps_spec},'VariableNames',"err_roll_TT_ps_spec")];
+
+
+
+        %-----------------------------------------------------------------------------
+
+
+
+
+
+        
+
+        %-----------------------------------------------------------------------------
+              
+
+        %FINO A QUI
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 
         %% Concatenate frames.
         frames = [frames;frame]; %#ok<*AGROW>
