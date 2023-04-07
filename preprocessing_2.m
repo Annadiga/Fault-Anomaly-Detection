@@ -19,8 +19,8 @@ fs_new = 25; % New sampling rate
 % popoliamo tabella finale in riga j perché ogni riga corrisponde ad un
 % test
 
-folder = 'processed_MAT_Files'; % replace with the path to your folder
-fileList = dir(fullfile(folder, '*.mat')); % list all files in folder with .txt extension
+folder = 'processed_MAT_Files';
+fileList = dir(fullfile(folder, '*.mat')); % list all files in folder with .mat extension
 
 %fileList = dir([folder '*.mat']);
 disp(fileList)
@@ -33,7 +33,7 @@ for j = 1:length(fileList)
     %j = 1; % lo leveremo con ciclo esterno perché faremo j = 1:numel(nomi dei file (test))
   
     %% Input .mat file
-    % Please change the path to a sequence .mat file from the dataset
+    
     % filename = 'processed_MAT_Files/carbonZ_2018-07-18-15-53-31_1_engine_failure.mat';
     
     fault_label = int8(0); % if 0 NO FAULT
