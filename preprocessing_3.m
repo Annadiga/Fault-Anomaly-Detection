@@ -19,7 +19,7 @@ fs_new = 25; % New sampling rate
 % popoliamo tabella finale in riga j perché ogni riga corrisponde ad un
 % test
 
-folder = 'processed_MAT_Files';
+folder = 'NewFilesWithSplitFault_NoFault';
 fileList = dir(fullfile(folder, '*.mat')); % list all files in folder with .mat extension
 
 %fileList = dir([folder '*.mat']);
@@ -37,8 +37,12 @@ for j = 1:length(fileList)
     % filename = 'processed_MAT_Files/carbonZ_2018-07-18-15-53-31_1_engine_failure.mat';
     
     fault_label = int8(0); % if 0 NO FAULT
+
+    if contains(filename, 'no_failure')
+        fault_label = 0;
+        dataTable.FaultLabel(j) = fault_label;
     
-    if contains(filename, 'engine_failure')
+    elseif contains(filename, 'engine_failure')
         fault_label = 1;
         dataTable.FaultLabel(j) = fault_label;
 
