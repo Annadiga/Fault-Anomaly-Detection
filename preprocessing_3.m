@@ -313,6 +313,21 @@ for j = 1:length(fileList)
             elseif(remain ~= 1) % vogliamo numero di righe multiplo di 64 + 1 di scarto           
                 test_TT = test_TT(1:end-(remain-1),:);
             end
+            
+            dur1 = duration(0, 0, 17.92);  % 0 hours 0 minutes and 17.92 seconds
+            if (test_TT.timestamps(size(test_TT, 1)) == dur1)
+                test_TT = test_TT(1:end-(1),:);
+            end
+
+            dur2 = duration(0, 0, 35.84);  
+            if (test_TT.timestamps(size(test_TT, 1)) == dur2)
+                test_TT = test_TT(1:end-(1),:);
+            end
+            
+            dur3 = duration(0, 0, 71.68);  
+            if (test_TT.timestamps(size(test_TT, 1)) == dur3)
+                test_TT = test_TT(1:end-(1),:);
+            end
 
 
             %{
@@ -483,8 +498,8 @@ for j = 1:length(fileList)
         end
     end
 
-    %if j == 30
-        %return
-    %end
+    %if j == 11
+    %   return
+    % end
 end
 
