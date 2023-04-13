@@ -114,6 +114,7 @@ for j = 1:length(fileList)
     
    
     for i = 1:numel(topics)
+ 
         % disp(i)
         % disp(numel(topics))
     
@@ -126,7 +127,7 @@ for j = 1:length(fileList)
         end
         %}
 
-        
+
         % Assign data to variable topic 
         topic = Sequence.GetTopicByName(topic_name{1});
     
@@ -138,9 +139,15 @@ for j = 1:length(fileList)
     
         % Add column "times" with normalized time
         data.times = times;
-        timestamps = seconds(data.times);
-    
         
+        if contains(filename, 'no_failure')
+           data([data.times] <= 5, :) = [];
+           data.times = data.times - 5;
+        end
+        % else taglia ultimi secondi PER ORA NO
+        
+        timestamps = seconds(data.times);
+
         
         if isequal(topic_name{1}, 'mavros_imu_data')
             
@@ -288,7 +295,23 @@ for j = 1:length(fileList)
     
             % test_TT = synchronize(topic_velocity_TT,topic_global_position_TT, topic_imu_data_row_TT, 'union', 'linear');
             test_TT = synchronize(topic_velocity_TT,topic_global_position_TT, topic_imu_data_TT, topic_err_roll_TT, topic_err_airspeed_TT, topic_info_errors_TT, topic_err_yaw_TT, topic_err_pitch_TT, 'regular', 'linear', 'SampleRate', fs_new);
-    
+            
+            num_rows_test_TT = size(test_TT, 1);
+
+            remain = rem(num_rows_test_TT, 64);
+
+            if(remain ~= 0)
+                
+                % test_TT([Sequence.Topics.(topic_name).time_recv] >= time_first_failure,:) = [];
+                % poni nulle le ultime rem(num_rows_test_TT, 64) di test_TT  = []
+
+                test_TT = test_TT(1:end-remain,:);
+            end
+               
+            
+
+       
+            return
             %{
             f1=figure('Name', 'errVel_x before and after sampling','position',[150,0,1000,650]);
             f11=subplot(2,1,1,'Parent',f1);
