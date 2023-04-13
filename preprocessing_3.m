@@ -300,18 +300,13 @@ for j = 1:length(fileList)
 
             remain = rem(num_rows_test_TT, 64);
 
-            if(remain ~= 0)
+            if(remain ~= 1) % vogliamo numero di righe multiplo di 64 + 1 di scarto
                 
-                % test_TT([Sequence.Topics.(topic_name).time_recv] >= time_first_failure,:) = [];
-                % poni nulle le ultime rem(num_rows_test_TT, 64) di test_TT  = []
-
-                test_TT = test_TT(1:end-remain,:);
+                test_TT = test_TT(1:end-(remain-1),:);
+  
             end
-               
-            
 
-       
-            return
+
             %{
             f1=figure('Name', 'errVel_x before and after sampling','position',[150,0,1000,650]);
             f11=subplot(2,1,1,'Parent',f1);
@@ -482,5 +477,8 @@ for j = 1:length(fileList)
         end
     end
 
+    if j == 2
+        return
+    end
 end
 
