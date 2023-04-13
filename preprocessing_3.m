@@ -295,15 +295,23 @@ for j = 1:length(fileList)
     
             % test_TT = synchronize(topic_velocity_TT,topic_global_position_TT, topic_imu_data_row_TT, 'union', 'linear');
             test_TT = synchronize(topic_velocity_TT,topic_global_position_TT, topic_imu_data_TT, topic_err_roll_TT, topic_err_airspeed_TT, topic_info_errors_TT, topic_err_yaw_TT, topic_err_pitch_TT, 'regular', 'linear', 'SampleRate', fs_new);
+                        
+            test_TT = test_TT([test_TT.timestamps] >= 0,:);
+
+            if(test_TT.timestamps(1) ~= 0)
+                newRow = test_TT(1,:);
+                test_TT = [newRow; test_TT(:,:)];
+                test_TT.timestamps(1) = 0;
+            end
             
             num_rows_test_TT = size(test_TT, 1);
-
+            
             remain = rem(num_rows_test_TT, 64);
 
-            if(remain ~= 1) % vogliamo numero di righe multiplo di 64 + 1 di scarto
-                
+            if(remain == 0)
+                test_TT = test_TT(1:end-63,:);
+            elseif(remain ~= 1) % vogliamo numero di righe multiplo di 64 + 1 di scarto           
                 test_TT = test_TT(1:end-(remain-1),:);
-  
             end
 
 
@@ -464,9 +472,7 @@ for j = 1:length(fileList)
     
             % topic mavros info pitch
             dataTable.err_pitch_TT(j) = {err_pitch_TT};
-    
-           
-            
+
     
             % topic mvctrl path dev
             %{
@@ -477,8 +483,8 @@ for j = 1:length(fileList)
         end
     end
 
-    if j == 2
-        return
-    end
+    %if j == 30
+        %return
+    %end
 end
 
