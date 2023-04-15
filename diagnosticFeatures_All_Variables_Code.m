@@ -1,7 +1,7 @@
 
-diagnosticFeatures_altitude_linAccy(dataTable)
+diagnosticFeatures_all(dataTable)
 
-function [featureTable,outputTable] = diagnosticFeatures_altitude_linAccy(inputData)
+function [featureTable,outputTable] = diagnosticFeatures_all(inputData)
 %DIAGNOSTICFEATURES recreates results in Diagnostic Feature Designer.
 %
 % Input:
@@ -110,7 +110,7 @@ while hasdata(outputEnsemble)
     % Get the frame intervals.
     lowerBound = min([linAcc_yTT_full.Time(1), linAcc_yTT_full.Time(1), linAcc_zTT_full.Time(1), angVel_xTT_full.Time(1), angVel_yTT_full.Time(1), angVel_zTT_full.Time(1), errVel_xTT_full.Time(1), errVel_yTT_full.Time(1), errVel_zTT_full.Time(1), altitudeTT_full.Time(1), latitudeTT_full.Time(1), longitudeTT_full.Time(1),  err_roll_TT_full.Time(1), err_airspeed_TT_full.Time(1), aspd_error_TT_full.Time(1), alt_error_TT_full.Time(1), err_yaw_TT_full.Time(1), err_pitch_TT_full.Time(1)]);
     upperBound = max([linAcc_yTT_full.Time(end), linAcc_yTT_full.Time(end), linAcc_zTT_full.Time(end), angVel_xTT_full.Time(end), angVel_yTT_full.Time(end), angVel_zTT_full.Time(end), errVel_xTT_full.Time(end), errVel_yTT_full.Time(end), errVel_zTT_full.Time(end), altitudeTT_full.Time(end), latitudeTT_full.Time(end), longitudeTT_full.Time(end),  err_roll_TT_full.Time(end), err_airspeed_TT_full.Time(end), aspd_error_TT_full.Time(end), alt_error_TT_full.Time(end), err_yaw_TT_full.Time(end), err_pitch_TT_full.Time(end)]);
-    fullIntervals = frameintervals([lowerBound upperBound],20,20,'FrameUnit',"seconds");
+    fullIntervals = frameintervals([lowerBound upperBound],2.56,2.56,'FrameUnit',"seconds");
     intervals = fullIntervals;
 
     % Initialize a table to store frame results.
@@ -177,11 +177,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
@@ -306,11 +306,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
@@ -435,11 +435,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
@@ -565,11 +565,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
@@ -694,11 +694,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
@@ -825,11 +825,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
@@ -957,11 +957,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
@@ -1088,11 +1088,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
@@ -1218,11 +1218,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
@@ -1352,11 +1352,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
@@ -1487,11 +1487,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
@@ -1617,11 +1617,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
@@ -1747,11 +1747,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
@@ -1878,11 +1878,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
@@ -2008,11 +2008,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
@@ -2139,11 +2139,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
@@ -2270,11 +2270,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
@@ -2400,11 +2400,11 @@ while hasdata(outputEnsemble)
 
             % Compute the autoregressive model.
             data = iddata(x,[],Ts,'TimeUnit',tuTime,'OutputName','SpectrumData');
-            arOpt = arOptions('Approach','fb','Window','now','EstimateCovariance',false);
-            model = ar(data,12,arOpt);
+            arOpt = arOptions('Approach','ls','Window','pow','EstimateCovariance',false);
+            model = ar(data,13,arOpt);
 
             % Compute the power spectrum.
-            f = linspace(0,12.5,1000);
+            f = linspace(0,12.5,10000);
             f = f*funitconv('Hz','cycles/TimeUnit','seconds');
             [ps,w] = spectrum(model,2*pi*f);
             ps = reshape(ps, numel(ps), 1);
