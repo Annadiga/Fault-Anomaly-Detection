@@ -6,7 +6,7 @@ clc;
 addpath('alfa-tools');
 
 folder = 'processed_MAT_Files';
-fileList = dir(fullfile(folder, '*.mat')); % list all files in folder with .txt extension
+fileList = dir(fullfile(folder, '*.mat')); % list all files in folder with .mat extension
 
 
 disp(fileList)
