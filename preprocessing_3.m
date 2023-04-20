@@ -30,7 +30,7 @@ for j = 1:length(fileList)
     % Get the file name (including the path)
     filename = fullfile(folder, fileList(j).name);
    
-    %j = 1; % lo leveremo con ciclo esterno perché faremo j = 1:numel(nomi dei file (test))
+    %j = 1; % rimosso perchè presente ciclo esterno -> j = 1:numel(nomi dei file (test))
   
     %% Input .mat file
     
@@ -56,7 +56,7 @@ for j = 1:length(fileList)
     
     %{
     elseif contains(filename, 'left_aileron__right_aileron__failure') 
-        % fault_label = 100;
+        % fault_label = 100;    %label provvisoria prima di fare lo split del test
         % dataTable.FaultLabel(j) = fault_label; 
         % carbonZ_2018-09-11-14-52-54_left_aileron__right_aileron__failure
         continue % go to the next for loop
@@ -95,8 +95,6 @@ for j = 1:length(fileList)
         6 rudder sinistra
         7 rudder destra
         8 elevator posizione 0
-
-        100 aileron sinistra prima e poi aileron destro
     %}
     
     
@@ -144,7 +142,6 @@ for j = 1:length(fileList)
            data([data.times] <= 5, :) = [];
            data.times = data.times - 5;
         end
-        % else taglia ultimi secondi PER ORA NO
         
         timestamps = seconds(data.times);
 
