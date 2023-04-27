@@ -1,6 +1,6 @@
 # Fault and anomaly detection of a fixed-wing aircraft
 
-Main goal of this project was creating a diagnostic classificator to detecte anomalies during flight tests.
+Main goal of this project was creating a diagnostic classificator to detect anomalies during flight tests.
  Dataset used is the ALFA dataset, containing flight data of a fixed-wing UAV. 
  
  ## Steps
@@ -54,3 +54,7 @@ A possible future development of the project could involve collecting flight tes
 # Tools
 
 For ALFA Dataset manipulation "alfa-tools" is needed. Download it at this [repository](https://github.com/castacks/alfa-dataset-tools) inside folder "alfa-matlab".
+
+# Authors
+- Burini Lisa
+- Di Gaetano Anna
