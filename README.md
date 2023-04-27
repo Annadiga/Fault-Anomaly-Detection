@@ -8,7 +8,7 @@ Main goal of this project was creating a diagnostic classificator to detecte ano
 
  - Dataset structure analysis
  - Fault-free flight and faulty flight split
- - Removal od first second of each flight
+ - Removal of the first few seconds from each flight test based on transient analysis
  - Variables selection
  - Data synchronization at 25 Hz
 
