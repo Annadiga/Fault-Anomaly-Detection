@@ -32,7 +32,7 @@ Main goal of this project was creating a diagnostic classificator to detecte ano
  Best classifier seems to be the Ensemble, here the results on test set:
 
 | Class | Precision | Recall | F1-score
-|--|--|--|--|--|--|
+|--|--|--|--|
 |  	0	|   0.97	|	0.92 | 0.95
 |  	1	|  	0.75	|	0.92 | 0.83
 |  	2	|  0.50		|	0.25 | 0.33
